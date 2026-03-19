@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>非遗文商平台 v5.0</title>
+    <title>非遗文商平台 v6.0</title>
     <style>
         /* ================= 基础重置与变量 ================= */
         :root { --primary-color: #c43c33; --bg-color: #f5f5f5; --text-main: #333333; --text-sub: #999999; --gold-color: #d4a36b; }
@@ -65,11 +65,16 @@
         .member-header-container { background: #deac76; padding: 15px 20px 30px; position: relative; }
         .member-top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: #333; font-size: 18px; font-weight: bold;}
         .user-card { background: linear-gradient(135deg, #ffffff, #fdfbf9); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 10px;}
-        .user-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .user-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .login-text { font-size: 20px; font-weight: bold; }
         .avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;}
         .user-stats { display: flex; justify-content: space-between; text-align: center; } .stat-item { flex: 1; } .stat-item .val { font-size: 18px; font-weight: bold; margin-bottom: 4px; } .stat-item .lbl { font-size: 12px; color: var(--text-sub); }
-        .logout-btn { background: rgba(0,0,0,0.1); border: none; padding: 5px 10px; border-radius: 15px; font-size: 12px; margin-top: 10px; cursor: pointer;}
+        
+        /* 按钮组容器 */
+        .action-btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
+        .logout-btn { background: rgba(0,0,0,0.08); color: #333; border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer; transition: 0.2s;}
+        .logout-btn:hover { background: rgba(0,0,0,0.15); }
+
         .member-section { background: #fff; margin: 10px 15px; border-radius: 12px; padding: 15px; }
         .member-icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 0; margin-top: 15px;}
         .member-icon-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #666; cursor: pointer; position: relative;}
@@ -105,14 +110,14 @@
         .order-list-item { background: #fff; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .order-status { float: right; color: var(--primary-color); font-size: 14px; font-weight: bold;}
 
-        /* ================= 登录/注册 弹窗 ================= */
+        /* ================= 各类弹窗样式 ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .modal-box { background: #fff; width: 85%; max-width: 320px; border-radius: 12px; padding: 25px 20px; position: relative;}
         .modal-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; }
         .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: bold; color: #999; }
         .modal-tab.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
-        .auth-form input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
-        .auth-form select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; }
+        .auth-form-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        select.auth-form-input { appearance: none; }
         .btn-submit { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px; border-radius: 25px; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
         .btn-close-modal { position: absolute; top: 10px; right: 15px; font-size: 20px; color: #999; cursor: pointer; }
 
@@ -126,7 +131,7 @@
         .admin-menu-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; color: #a6adb4; }
         .admin-menu-item:hover, .admin-menu-item.active { background: #1890ff; color: #fff; }
         .admin-logout-desktop { padding: 15px; text-align: center; background: #ff4d4f; cursor: pointer; }
-        .admin-logout-mobile { display: none; } /* 移动端退出按钮默认隐藏 */
+        .admin-logout-mobile { display: none; } 
         
         .admin-content { flex: 1; overflow-y: auto; padding: 20px; }
         .admin-panel { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: none; min-height: 80vh;}
@@ -141,34 +146,24 @@
 
         /* 表格基础样式与响应式包裹层 */
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 650px; /* 确保表格在手机上能横向滑动而不被过度压缩 */ }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 650px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background: #fafafa; font-weight: bold; }
 
-        /* ========================================================== */
         /* ================= 后台移动端适配核心代码 ================= */
-        /* ========================================================== */
         @media (max-width: 768px) {
-            #admin-dashboard { flex-direction: column; } /* 侧边栏和内容改为上下排列 */
+            #admin-dashboard { flex-direction: column; } 
             .admin-sidebar { width: 100%; height: auto; flex-direction: column; }
-            
-            /* Logo 区域变为顶栏，包含退出按钮 */
             .admin-logo { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; text-align: left; font-size: 18px; letter-spacing: 1px; }
-            .admin-logout-desktop { display: none; } /* 隐藏电脑端底部退出按钮 */
+            .admin-logout-desktop { display: none; } 
             .admin-logout-mobile { display: block; background: #ff4d4f; color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; letter-spacing: 0; }
-            
-            /* 菜单变为横向可滑动 */
             .admin-menu { display: flex; flex-direction: row; padding: 0; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #ddd; }
             .admin-menu-item { padding: 12px 20px; flex: 1; text-align: center; }
-            
-            /* 内容区域间距调整 */
             .admin-content { padding: 10px; width: 100%; box-sizing: border-box; }
             .admin-panel { padding: 15px; min-height: calc(100vh - 120px); }
             .admin-panel h2 { font-size: 18px; margin-bottom: 15px; }
-            
-            /* 适配添加商品表单为上下结构 */
             .admin-form-row { flex-direction: column; gap: 10px; align-items: stretch; margin-bottom: 10px; }
-            .admin-form-row input, .admin-form-row textarea { width: 100%; }
+            .admin-form-row input, .admin-form-row textarea { width: 100%; box-sizing: border-box; }
             .admin-form-row button { margin-top: 5px; height: 44px !important; width: 100%; font-size: 14px; }
         }
     </style>
@@ -237,8 +232,10 @@
         <div class="member-header-container">
             <div class="member-top-nav"><span>会员中心</span></div>
             <div class="user-card">
-                <div class="user-info-top">
-                    <div class="login-text" id="member-username" onclick="requireLogin()">点击登录</div>
+                <!-- 【唯一修改点】给这整个顶部区域增加 onclick 事件，并加上鼠标指针手势，彻底扩大点击范围 -->
+                <div class="user-info-top" onclick="requireLogin()" style="cursor: pointer;">
+                    <!-- 显示昵称优先，没有昵称显示账号 -->
+                    <div class="login-text" id="member-username">点击登录</div>
                     <img class="avatar" id="member-avatar" src="https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80" alt="avatar">
                 </div>
                 <div class="user-stats">
@@ -246,7 +243,14 @@
                     <div class="stat-item"><div class="val">0.00</div><div class="lbl">余额</div></div>
                     <div class="stat-item"><div class="val">0</div><div class="lbl">优惠券</div></div>
                 </div>
-                <button class="logout-btn" id="btn-logout" style="display:none;" onclick="logout()">退出登录</button>
+                
+                <!-- 修改资料、登录后台、退出登录 等操作按钮组 -->
+                <div class="action-btn-group">
+                    <button class="logout-btn" id="btn-edit-profile" style="display:none;" onclick="openEditProfileModal()">修改资料</button>
+                    <!-- 登录后台，无需退出当前用户 -->
+                    <button class="logout-btn" id="btn-admin-login" style="display:none;" onclick="openAdminVerifyModal()">登录后台</button>
+                    <button class="logout-btn" id="btn-logout" style="display:none;" onclick="logout()">退出登录</button>
+                </div>
             </div>
         </div>
         <div class="member-section">
@@ -275,7 +279,7 @@
     </div>
 </div>
 
-<!-- ================= 独立页：商品详情页 ================= -->
+<!-- ================= 各类独立子页 (前台详情/结算等) ================= -->
 <div id="page-detail" class="full-page">
     <div class="detail-header" onclick="closeFullPage('page-detail')">&lt;</div>
     <div class="detail-img-box"><img id="detail-img" src="" alt="商品图"></div>
@@ -285,56 +289,43 @@
     </div>
     <div class="detail-desc" id="detail-desc">这里是商品详细介绍...</div>
     <div class="detail-bottom-bar">
-        <div class="action-btns">
-            <button class="btn-buy" onclick="goToCheckout()" style="flex:2;">立即购买</button>
-        </div>
+        <div class="action-btns"><button class="btn-buy" onclick="goToCheckout()" style="flex:2;">立即购买</button></div>
     </div>
 </div>
 
-<!-- ================= 独立页：确认订单与结算页 ================= -->
 <div id="page-checkout" class="full-page" style="background: #f5f5f5;">
     <div class="detail-header" onclick="closeFullPage('page-checkout')">&lt;</div>
     <div class="checkout-header">确认订单</div>
-    
     <div class="checkout-section">
         <h3>收货地址</h3>
         <p style="font-size:12px; color:#999; margin: 5px 0;">首次购买需填写，将保存至您的账户</p>
-        <div class="form-group">
-            <textarea id="checkout-address" rows="3" placeholder="请输入您的详细收货地址 (省市区街道门牌号)"></textarea>
-        </div>
+        <div class="form-group"><textarea id="checkout-address" rows="3" placeholder="请输入您的详细收货地址 (省市区街道门牌号)"></textarea></div>
     </div>
-
     <div class="checkout-section">
         <h3>商品信息</h3>
         <div style="display:flex; margin-top:10px;">
             <img id="checkout-img" src="" style="width:60px; height:60px; object-fit:cover; border-radius:4px; margin-right:10px;">
-            <div>
-                <div id="checkout-title" style="font-size:14px; margin-bottom:5px;">名称</div>
-                <div id="checkout-price" style="color:var(--primary-color); font-weight:bold;">¥0.00</div>
-            </div>
+            <div><div id="checkout-title" style="font-size:14px; margin-bottom:5px;">名称</div><div id="checkout-price" style="color:var(--primary-color); font-weight:bold;">¥0.00</div></div>
         </div>
     </div>
-
     <div class="checkout-section">
         <h3>支付方式</h3>
         <label class="payment-method"><input type="radio" name="pay-method" value="WeChat" checked> 🟢 微信支付</label>
         <label class="payment-method"><input type="radio" name="pay-method" value="Alipay"> 🔵 支付宝</label>
     </div>
-
     <div class="pay-footer">
         <div>合计: <span id="checkout-total" style="color:var(--primary-color); font-size:20px; font-weight:bold;">¥0.00</span></div>
         <button class="pay-btn" onclick="submitOrder()">立即支付</button>
     </div>
 </div>
 
-<!-- ================= 独立页：我的订单列表 ================= -->
 <div id="page-my-orders" class="full-page" style="background: #f5f5f5;">
     <div class="detail-header" onclick="closeFullPage('page-my-orders')">&lt;</div>
     <div class="checkout-header" id="my-orders-title">订单列表</div>
     <div id="my-orders-list" style="padding-bottom: 20px;"></div>
 </div>
 
-<!-- ================= 登录/注册 弹窗 ================= -->
+<!-- ================= 弹窗：普通登录/注册 ================= -->
 <div id="login-modal" class="modal-overlay">
     <div class="modal-box">
         <span class="btn-close-modal" onclick="closeModal('login-modal')">×</span>
@@ -343,24 +334,55 @@
             <div class="modal-tab" id="tab-register" onclick="toggleAuth('register')">注册</div>
         </div>
         
-        <!-- 登录表单 -->
-        <div id="form-login" class="auth-form">
-            <select id="login-role">
+        <div id="form-login">
+            <select id="login-role" class="auth-form-input">
                 <option value="user">普通用户</option>
                 <option value="admin">管理员 (后台)</option>
             </select>
-            <input type="text" id="login-account" placeholder="请输入账号 (管理员默认 root)">
-            <input type="password" id="login-password" placeholder="请输入密码 (管理员默认 123456)">
+            <input type="text" id="login-account" class="auth-form-input" placeholder="请输入账号 (管理员默认 root)">
+            <input type="password" id="login-password" class="auth-form-input" placeholder="请输入密码 (管理员默认 123456)">
             <button class="btn-submit" onclick="doLogin()">立即登录</button>
         </div>
 
-        <!-- 注册表单 -->
-        <div id="form-register" class="auth-form" style="display:none;">
-            <input type="text" id="reg-account" placeholder="设置账号">
-            <input type="password" id="reg-password" placeholder="设置密码">
-            <input type="text" id="reg-avatar" placeholder="头像URL链接 (选填)">
+        <div id="form-register" style="display:none;">
+            <input type="text" id="reg-account" class="auth-form-input" placeholder="设置账号 (即登录名)">
+            <input type="password" id="reg-password" class="auth-form-input" placeholder="设置密码">
+            <!-- 注册去掉URL头像输入，通过修改资料上传 -->
             <button class="btn-submit" onclick="doRegister()">立即注册</button>
         </div>
+    </div>
+</div>
+
+<!-- ================= 弹窗：前台修改个人资料 ================= -->
+<div id="edit-profile-modal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="btn-close-modal" onclick="closeModal('edit-profile-modal')">×</span>
+        <h3 style="margin-bottom: 15px; text-align: center;">修改个人资料</h3>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">昵称 (如果不填默认显示账号)</label>
+            <input type="text" id="edit-profile-nickname" class="auth-form-input" placeholder="请输入新昵称">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">上传新头像</label>
+            <!-- 支持本地选择图片上传 -->
+            <input type="file" id="edit-profile-avatar-file" accept="image/*" class="auth-form-input" style="padding: 9px;">
+        </div>
+        
+        <button class="btn-submit" onclick="saveUserProfile()">保存修改</button>
+    </div>
+</div>
+
+<!-- ================= 弹窗：普通用户一键快捷验证管理员 ================= -->
+<div id="admin-verify-modal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="btn-close-modal" onclick="closeModal('admin-verify-modal')">×</span>
+        <h3 style="margin-bottom: 15px; text-align: center; color: var(--primary-color);">管理员登录</h3>
+        <p style="font-size:12px; color:#999; margin-bottom:15px; text-align:center;">验证身份直接进入后台，不影响当前用户状态</p>
+        <input type="text" id="admin-verify-account" class="auth-form-input" placeholder="管理员账号 (默认 root)">
+        <input type="password" id="admin-verify-password" class="auth-form-input" placeholder="密码 (默认 123456)">
+        <button class="btn-submit" onclick="verifyAdminAndEnter()">进入后台</button>
     </div>
 </div>
 
@@ -368,8 +390,7 @@
 <div id="admin-dashboard">
     <div class="admin-sidebar">
         <div class="admin-logo">
-            非遗后台管理
-            <!-- 专为移动端准备的退出按钮 -->
+            后台管理
             <span class="admin-logout-mobile" onclick="logoutAdmin()">退出</span>
         </div>
         <div class="admin-menu">
@@ -377,29 +398,33 @@
             <div class="admin-menu-item" onclick="switchAdminTab('orders', this)">📝 订单管理</div>
             <div class="admin-menu-item" onclick="switchAdminTab('users', this)">👥 用户管理</div>
         </div>
-        <!-- 桌面端保留在底部的退出按钮 -->
         <div class="admin-logout-desktop" onclick="logoutAdmin()">退出后台系统</div>
     </div>
     
     <div class="admin-content">
         <!-- 1. 商品管理 -->
         <div id="admin-products" class="admin-panel active">
-            <h2>首页商品管理</h2>
+            <h2>商品管理</h2>
             <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h3 style="margin-bottom:10px; font-size:14px;">添加新商品</h3>
+                <h3 id="admin-prod-form-title" style="margin-bottom:10px; font-size:14px;">添加新商品</h3>
                 <div class="admin-form-row">
                     <input type="text" id="add-prod-name" placeholder="商品名称">
                     <input type="number" id="add-prod-price" placeholder="价格 (元)">
                 </div>
-                <div class="admin-form-row">
-                    <input type="text" id="add-prod-img" placeholder="商品图片 URL">
+                <!-- 改为本地图片文件上传 -->
+                <div class="admin-form-row" style="flex-direction: row;">
+                    <input type="file" id="add-prod-img-file" accept="image/*" style="padding: 5px; background: #fff;" onchange="previewProductImage(this)">
+                    <img id="add-prod-img-preview" src="" style="width:40px; height:40px; object-fit:cover; border-radius:4px; display:none; border:1px solid #ddd;">
                 </div>
                 <div class="admin-form-row">
                     <textarea id="add-prod-desc" rows="2" placeholder="商品介绍文字..."></textarea>
-                    <button class="admin-btn btn-blue" style="height:50px; padding:0 30px;" onclick="adminAddProduct()">+ 添加商品</button>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button id="btn-save-prod" class="admin-btn btn-blue" style="height:40px; flex:1;" onclick="adminSaveProduct()">+ 添加商品</button>
+                    <!-- 取消修改按钮 -->
+                    <button id="btn-cancel-prod" class="admin-btn btn-orange" style="height:40px; flex:1; display:none;" onclick="cancelEditProduct()">取消修改</button>
                 </div>
             </div>
-            <!-- 加入 table-responsive 包裹层解决手机表格溢出问题 -->
             <div class="table-responsive">
                 <table id="admin-product-table">
                     <thead><tr><th>ID</th><th>图片</th><th>名称</th><th>价格</th><th>操作</th></tr></thead>
@@ -411,10 +436,9 @@
         <!-- 2. 订单管理 -->
         <div id="admin-orders" class="admin-panel">
             <h2>商品订单管理</h2>
-            <!-- 加入 table-responsive 包裹层解决手机表格溢出问题 -->
             <div class="table-responsive">
                 <table id="admin-order-table">
-                    <thead><tr><th>订单号</th><th>购买用户</th><th>商品名称</th><th>收货地址</th><th>支付方式</th><th>状态</th><th>操作</th></tr></thead>
+                    <thead><tr><th>订单号</th><th>购买用户</th><th>商品名称</th><th>收货地址</th><th>状态</th><th>操作</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -423,10 +447,10 @@
         <!-- 3. 用户信息管理 -->
         <div id="admin-users" class="admin-panel">
             <h2>用户信息管理</h2>
-            <!-- 加入 table-responsive 包裹层解决手机表格溢出问题 -->
+            <p style="font-size:12px; color:#666; margin-bottom:10px;">💡 提示：点击用户头像图片可直接为其上传替换新头像。</p>
             <div class="table-responsive">
                 <table id="admin-user-table">
-                    <thead><tr><th>角色</th><th>账号</th><th>密码</th><th>头像</th><th>收货地址</th><th>操作</th></tr></thead>
+                    <thead><tr><th>角色</th><th>账号/昵称</th><th>密码</th><th>头像 (点击修改)</th><th>收货地址</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -439,7 +463,7 @@
     // ================= 核心数据与初始化 (模拟数据库) =================
     const defaultData = {
         users:[
-            { id: 'admin_1', role: 'admin', account: 'root', password: '123456', address: '', avatar: '' }
+            { id: 'admin_1', role: 'admin', account: 'root', password: '123456', nickname: '超级管理员', address: '', avatar: '' }
         ],
         products:[
             { id: 1, name: "金箔蝴蝶标本成品美凤蝶标本手工七夕送礼...", price: "182.90", img: "https://images.unsplash.com/photo-1555662800-8d5427ec7f41?w=400&q=80", desc: "精美金箔蝴蝶标本，传统手工制作，适合七夕送礼收藏。" },
@@ -458,7 +482,14 @@
     let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
     let currentViewingProduct = null;
 
-    // ================= 前台逻辑：初始化渲染 =================
+    // 工具函数：读取本地文件转为 base64
+    function fileToBase64(file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => callback(e.target.result);
+        reader.readAsDataURL(file);
+    }
+
+    // ================= 前台逻辑：初始化与 UI 更新 =================
     function initApp() {
         renderHomeProducts();
         updateMemberUI();
@@ -483,17 +514,24 @@
 
     function updateMemberUI() {
         if(currentUser && currentUser.role === 'user') {
-            document.getElementById('member-username').innerText = currentUser.account;
-            document.getElementById('member-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1533611762193-4e4b513dc981?w=200&q=80';
-            document.getElementById('btn-logout').style.display = 'block';
+            // 优先显示昵称，没有则显示账号
+            document.getElementById('member-username').innerText = currentUser.nickname || currentUser.account;
+            document.getElementById('member-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80';
             
+            // 显示操作按钮组
+            document.getElementById('btn-logout').style.display = 'inline-block';
+            document.getElementById('btn-edit-profile').style.display = 'inline-block';
+            document.getElementById('btn-admin-login').style.display = 'inline-block';
+            
+            // 更新角标
             const orders = getData('orders').filter(o => o.userAccount === currentUser.account);
             const counts = { shipment: 0, receipt: 0, review: 0 };
             orders.forEach(o => {
                 if(o.status === 'pending_shipment') counts.shipment++;
                 if(o.status === 'pending_receipt') counts.receipt++;
                 if(o.status === 'pending_review') counts.review++;
-            });['shipment', 'receipt', 'review'].forEach(type => {
+            });
+            ['shipment', 'receipt', 'review'].forEach(type => {
                 const el = document.getElementById(`badge-${type}`);
                 el.innerText = counts[type];
                 el.style.display = counts[type] > 0 ? 'inline-block' : 'none';
@@ -501,11 +539,17 @@
         } else {
             document.getElementById('member-username').innerText = '点击登录';
             document.getElementById('member-avatar').src = 'https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80';
-            document.getElementById('btn-logout').style.display = 'none';['shipment', 'receipt', 'review'].forEach(type => { document.getElementById(`badge-${type}`).style.display = 'none'; });
+            // 隐藏操作按钮
+            document.getElementById('btn-logout').style.display = 'none';
+            document.getElementById('btn-edit-profile').style.display = 'none';
+            document.getElementById('btn-admin-login').style.display = 'none';
+            ['shipment', 'receipt', 'review'].forEach(type => { 
+                document.getElementById(`badge-${type}`).style.display = 'none'; 
+            });
         }
     }
 
-    // ================= 前台逻辑：导航与弹窗 =================
+    // ================= 前台逻辑：导航、购买、订单查看 =================
     function switchTab(tabId, element, requireAuth = false) {
         document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -515,10 +559,23 @@
     }
     
     function closeFullPage(id) { document.getElementById(id).style.display = 'none'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function requireLogin() { if(!currentUser) document.getElementById('login-modal').style.display = 'flex'; }
+    
+    function closeModal(id) { 
+        document.getElementById(id).style.display = 'none'; 
+        // 查找所有输入框并清空
+        const inputs = document.querySelectorAll(`#${id} input`);
+        inputs.forEach(input => {
+            if(input.type === 'file') input.value = '';
+            else input.value = '';
+        });
+    }
+    
+    function requireLogin() { 
+        if(!currentUser) {
+            document.getElementById('login-modal').style.display = 'flex'; 
+        }
+    }
 
-    // ================= 前台逻辑：商品购买与结算 =================
     function openProductDetail(id) {
         const p = getData('products').find(x => x.id === id);
         if(!p) return;
@@ -550,7 +607,6 @@
     function submitOrder() {
         const address = document.getElementById('checkout-address').value.trim();
         const payMethod = document.querySelector('input[name="pay-method"]:checked').value;
-        
         if(!address) { alert('请填写收货地址！'); return; }
 
         let users = getData('users');
@@ -561,7 +617,7 @@
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
         let orders = getData('orders');
-        const newOrder = {
+        orders.push({
             id: 'ORD' + new Date().getTime(),
             userAccount: currentUser.account,
             productName: currentViewingProduct.name,
@@ -571,8 +627,7 @@
             payMethod: payMethod === 'WeChat' ? '微信支付' : '支付宝',
             status: 'pending_shipment', 
             date: new Date().toLocaleString()
-        };
-        orders.push(newOrder);
+        });
         setData('orders', orders);
 
         alert('支付成功！商品将在后台排期发货。');
@@ -582,8 +637,7 @@
         document.querySelectorAll('.tab-item')[3].click(); 
     }
 
-    const statusMap = { 'pending_shipment': '待发货', 'pending_receipt': '待收货 (已发货)', 'pending_review': '待评价 (已完成)' };
-    
+    const statusMap = { 'pending_shipment': '待发货', 'pending_receipt': '待收货', 'pending_review': '待评价' };
     function showUserOrders(statusFilter) {
         if(!currentUser) return;
         document.getElementById('my-orders-title').innerText = statusMap[statusFilter] + '订单';
@@ -609,7 +663,7 @@
         document.getElementById('page-my-orders').style.display = 'block';
     }
 
-    // ================= 登录注册系统 =================
+    // ================= 前台逻辑：登录与注册 =================
     function toggleAuth(mode) {
         document.getElementById('tab-login').classList.toggle('active', mode === 'login');
         document.getElementById('tab-register').classList.toggle('active', mode === 'register');
@@ -620,16 +674,17 @@
     function doRegister() {
         const acc = document.getElementById('reg-account').value.trim();
         const pwd = document.getElementById('reg-password').value.trim();
-        const avatar = document.getElementById('reg-avatar').value.trim();
         if(!acc || !pwd) { alert('账号和密码不能为空！'); return; }
         
         let users = getData('users');
         if(users.some(u => u.account === acc)) { alert('账号已存在，请直接登录！'); return; }
         
-        users.push({ id: 'u_'+Date.now(), role: 'user', account: acc, password: pwd, avatar: avatar, address: '' });
+        users.push({ id: 'u_'+Date.now(), role: 'user', account: acc, password: pwd, nickname: '', avatar: '', address: '' });
         setData('users', users);
         alert('注册成功！请登录。');
         toggleAuth('login');
+        document.getElementById('reg-account').value = '';
+        document.getElementById('reg-password').value = '';
     }
 
     function doLogin() {
@@ -643,12 +698,8 @@
         if(user) {
             currentUser = user;
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            closeModal('login-modal');
-            if(role === 'admin') {
-                initAdmin();
-            } else {
-                updateMemberUI();
-            }
+            closeModal('login-modal'); 
+            if(role === 'admin') initAdmin(); else updateMemberUI();
         } else {
             alert('账号或密码错误，或身份不匹配！');
         }
@@ -660,7 +711,65 @@
         updateMemberUI();
     }
 
-    // ================= 管理员后台逻辑 =================
+    // ================= 前台修改个人资料 =================
+    function openEditProfileModal() {
+        if(!currentUser) return;
+        document.getElementById('edit-profile-nickname').value = currentUser.nickname || '';
+        document.getElementById('edit-profile-modal').style.display = 'flex';
+    }
+
+    function saveUserProfile() {
+        const newNickname = document.getElementById('edit-profile-nickname').value.trim();
+        const fileInput = document.getElementById('edit-profile-avatar-file');
+        
+        const finishSave = (base64Img) => {
+            let users = getData('users');
+            let userIdx = users.findIndex(u => u.account === currentUser.account);
+            if(userIdx !== -1) {
+                users[userIdx].nickname = newNickname;
+                if(base64Img) users[userIdx].avatar = base64Img;
+                
+                setData('users', users);
+                
+                currentUser.nickname = newNickname;
+                if(base64Img) currentUser.avatar = base64Img;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                updateMemberUI();
+                alert('资料修改成功！');
+                closeModal('edit-profile-modal');
+            }
+        };
+
+        if(fileInput.files && fileInput.files[0]) {
+            fileToBase64(fileInput.files[0], finishSave); 
+        } else {
+            finishSave(null); 
+        }
+    }
+
+    // ================= 快捷验证进入管理员后台 =================
+    function openAdminVerifyModal() {
+        document.getElementById('admin-verify-modal').style.display = 'flex';
+    }
+
+    function verifyAdminAndEnter() {
+        const acc = document.getElementById('admin-verify-account').value.trim();
+        const pwd = document.getElementById('admin-verify-password').value.trim();
+        const users = getData('users');
+        const adminUser = users.find(u => u.account === acc && u.password === pwd && u.role === 'admin');
+        
+        if(adminUser) {
+            closeModal('admin-verify-modal');
+            initAdmin();
+        } else {
+            alert('管理员账号或密码错误！');
+        }
+    }
+
+    // ==========================================================
+    // ================= 管理员后台逻辑 =========================
+    // ==========================================================
 
     function initAdmin() {
         document.getElementById('app').style.display = 'none'; 
@@ -671,9 +780,9 @@
     }
 
     function logoutAdmin() {
-        logout();
         document.getElementById('admin-dashboard').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+        updateMemberUI();
     }
 
     function switchAdminTab(tab, element) {
@@ -686,6 +795,19 @@
         if(tab==='users') renderAdminUsers();
     }
 
+    let editingProductId = null;
+    let tempProductImageBase64 = '';
+
+    function previewProductImage(input) {
+        if(input.files && input.files[0]) {
+            fileToBase64(input.files[0], (base64) => {
+                tempProductImageBase64 = base64;
+                document.getElementById('add-prod-img-preview').src = base64;
+                document.getElementById('add-prod-img-preview').style.display = 'block';
+            });
+        }
+    }
+
     function renderAdminProducts() {
         const products = getData('products');
         const tbody = document.querySelector('#admin-product-table tbody');
@@ -695,33 +817,75 @@
                 <td><img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;"></td>
                 <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</td>
                 <td>¥${p.price}</td>
-                <td>
+                <td style="white-space:nowrap;">
+                    <button class="admin-btn btn-orange" onclick="adminEditProduct(${p.id})">修改</button>
                     <button class="admin-btn btn-red" onclick="adminDeleteProduct(${p.id})">删除</button>
                 </td>
             </tr>
         `).join('');
     }
 
-    function adminAddProduct() {
+    function adminEditProduct(id) {
+        const p = getData('products').find(x => x.id === id);
+        if(!p) return;
+        editingProductId = p.id;
+        tempProductImageBase64 = p.img;
+        
+        document.getElementById('admin-prod-form-title').innerText = "修改商品信息 (ID: " + p.id + ")";
+        document.getElementById('add-prod-name').value = p.name;
+        document.getElementById('add-prod-price').value = p.price;
+        document.getElementById('add-prod-desc').value = p.desc || '';
+        document.getElementById('add-prod-img-file').value = ''; 
+        
+        document.getElementById('add-prod-img-preview').src = p.img;
+        document.getElementById('add-prod-img-preview').style.display = 'block';
+        
+        document.getElementById('btn-save-prod').innerText = "保存修改";
+        document.getElementById('btn-save-prod').className = "admin-btn btn-green";
+        document.getElementById('btn-cancel-prod').style.display = "block";
+    }
+
+    function cancelEditProduct() {
+        editingProductId = null;
+        tempProductImageBase64 = '';
+        document.getElementById('admin-prod-form-title').innerText = "添加新商品";
+        document.getElementById('add-prod-name').value = '';
+        document.getElementById('add-prod-price').value = '';
+        document.getElementById('add-prod-desc').value = '';
+        document.getElementById('add-prod-img-file').value = '';
+        document.getElementById('add-prod-img-preview').style.display = 'none';
+        
+        document.getElementById('btn-save-prod').innerText = "+ 添加商品";
+        document.getElementById('btn-save-prod').className = "admin-btn btn-blue";
+        document.getElementById('btn-cancel-prod').style.display = "none";
+    }
+
+    function adminSaveProduct() {
         const name = document.getElementById('add-prod-name').value;
         const price = document.getElementById('add-prod-price').value;
-        let img = document.getElementById('add-prod-img').value;
         const desc = document.getElementById('add-prod-desc').value;
         
         if(!name || !price) { alert('商品名称和价格必填！'); return; }
-        if(!img) img = 'https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=400&q=80'; 
+        const finalImg = tempProductImageBase64 || 'https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=400&q=80';
 
-        const products = getData('products');
-        const newId = products.length > 0 ? Math.max(...products.map(p=>p.id)) + 1 : 1;
-        products.push({ id: newId, name, price, img, desc });
+        let products = getData('products');
+
+        if(editingProductId) {
+            let idx = products.findIndex(p => p.id === editingProductId);
+            if(idx !== -1) {
+                products[idx] = { ...products[idx], name, price, img: finalImg, desc };
+            }
+            alert('商品修改成功！');
+        } else {
+            const newId = products.length > 0 ? Math.max(...products.map(p=>p.id)) + 1 : 1;
+            products.push({ id: newId, name, price, img: finalImg, desc });
+            alert('商品添加成功！');
+        }
+
         setData('products', products);
-        
         renderAdminProducts();
         renderHomeProducts(); 
-        
-        document.getElementById('add-prod-name').value = ''; document.getElementById('add-prod-price').value = '';
-        document.getElementById('add-prod-img').value = ''; document.getElementById('add-prod-desc').value = '';
-        alert('商品添加成功！已同步至前台推荐商品列表。');
+        cancelEditProduct(); 
     }
 
     function adminDeleteProduct(id) {
@@ -732,11 +896,11 @@
         renderHomeProducts();
     }
 
+    // ----------------- 后台：订单管理 -----------------
     function renderAdminOrders() {
         const orders = getData('orders');
         const tbody = document.querySelector('#admin-order-table tbody');
-        
-        if(orders.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#999;">暂无用户订单</td></tr>'; return; }
+        if(orders.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999;">暂无用户订单</td></tr>'; return; }
         
         tbody.innerHTML = orders.map(o => `
             <tr>
@@ -744,12 +908,10 @@
                 <td>${o.userAccount}</td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${o.productName}</td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${o.address}</td>
-                <td>${o.payMethod}</td>
                 <td style="color:${o.status==='pending_shipment'?'red':'#52c41a'}; font-weight:bold;">${statusMap[o.status]}</td>
                 <td style="white-space:nowrap;">
                     ${o.status === 'pending_shipment' ? `<button class="admin-btn btn-blue" onclick="adminProcessOrder('${o.id}', 'pending_receipt')">去发货</button>` : ''}
-                    ${o.status === 'pending_receipt' ? `<button class="admin-btn btn-green" onclick="adminProcessOrder('${o.id}', 'pending_review')">标记完成</button>` : ''}
-                    ${o.status === 'pending_review' ? `<span style="font-size:12px; color:#999;">无操作</span>` : ''}
+                    ${o.status === 'pending_receipt' ? `<button class="admin-btn btn-green" onclick="adminProcessOrder('${o.id}', 'pending_review')">完成</button>` : ''}
                 </td>
             </tr>
         `).join('');
@@ -762,45 +924,53 @@
             order.status = nextStatus;
             setData('orders', orders);
             renderAdminOrders();
-            alert('订单状态已更新！前台会员中心状态同步改变。');
-            updateMemberUI(); 
+            if(currentUser && currentUser.account === order.userAccount) updateMemberUI(); 
         }
     }
 
+    // ----------------- 后台：点击图片直接修改用户头像 -----------------
     function renderAdminUsers() {
         const users = getData('users');
         const tbody = document.querySelector('#admin-user-table tbody');
         tbody.innerHTML = users.map(u => `
             <tr>
                 <td style="white-space:nowrap;">${u.role === 'admin' ? '<span style="color:red;font-weight:bold;">管理员</span>' : '普通用户'}</td>
-                <td>${u.account}</td>
+                <td>${u.nickname || u.account}<br><small style="color:#999;">${u.account}</small></td>
                 <td>${u.password}</td>
-                <td><img src="${u.avatar || 'https://via.placeholder.com/40'}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"></td>
-                <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${u.address || '<span style="color:#ccc;">暂未填写</span>'}</td>
-                <td>
-                    <button class="admin-btn btn-orange" onclick="adminEditUser('${u.account}')">修改资料</button>
+                <td style="text-align:center;">
+                    <label style="cursor:pointer; display:inline-block; position:relative;" title="点击上传修改用户头像">
+                        <img src="${u.avatar || 'https://via.placeholder.com/40'}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid #ddd;">
+                        <input type="file" accept="image/*" style="display:none;" onchange="adminUpdateUserAvatar(this, '${u.account}')">
+                    </label>
                 </td>
+                <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${u.address || '<span style="color:#ccc;">暂未填写</span>'}</td>
             </tr>
         `).join('');
     }
 
-    function adminEditUser(account) {
-        let users = getData('users');
-        let user = users.find(u => u.account === account);
-        if(!user) return;
-        
-        const newPwd = prompt(`正在修改 ${account} 的密码:`, user.password);
-        if(newPwd === null) return;
-        const newAddr = prompt(`正在修改 ${account} 的收货地址:`, user.address);
-        
-        user.password = newPwd.trim() || user.password;
-        user.address = newAddr !== null ? newAddr.trim() : user.address;
-        
-        setData('users', users);
-        renderAdminUsers();
-        alert('用户信息修改成功！');
+    function adminUpdateUserAvatar(inputEl, account) {
+        if(inputEl.files && inputEl.files[0]) {
+            fileToBase64(inputEl.files[0], (base64) => {
+                let users = getData('users');
+                let user = users.find(u => u.account === account);
+                if(user) {
+                    user.avatar = base64;
+                    setData('users', users);
+                    
+                    if(currentUser && currentUser.account === account) {
+                        currentUser.avatar = base64;
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                        updateMemberUI();
+                    }
+                    renderAdminUsers(); 
+                    alert('已成功为该用户更换头像！');
+                }
+            });
+        }
     }
 
+
+    // ================= 执行初始化 =================
     initApp();
     setInterval(() => {
         let ci = document.getElementById('carousel-inner');
