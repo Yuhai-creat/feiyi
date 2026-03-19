@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>非遗文商平台</title>
+    <title>非遗文商平台 v3.0</title>
     <style>
         /* ================= 基础重置与变量 ================= */
         :root {
@@ -30,7 +30,7 @@
         .search-bar { flex: 1; background: #f0e6d2; border-radius: 20px; padding: 8px 15px; display: flex; align-items: center; color: #a08c70; font-size: 14px; }
         .search-bar input { border: none; background: transparent; outline: none; width: 100%; margin-left: 5px;}
 
-        /* ================= 轮播图 (新增) ================= */
+        /* ================= 轮播图 ================= */
         .carousel-container { position: relative; width: 100%; height: 180px; overflow: hidden; background: #eee; }
         .carousel-inner { display: flex; width: 400%; height: 100%; transition: transform 0.4s ease-in-out; }
         .carousel-inner img { width: 25%; height: 100%; object-fit: cover; }
@@ -38,30 +38,28 @@
         .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; transition: all 0.3s; }
         .dot.active { background: #fff; width: 15px; border-radius: 3px; }
 
-        /* ================= 文字分类导航 (独立一行) ================= */
+        /* ================= 文字分类导航 ================= */
         .text-nav { display: flex; justify-content: space-around; align-items: center; padding: 12px 10px; background: #fff; border-bottom: 1px solid #f0f0f0; overflow-x: auto; white-space: nowrap; }
         .text-nav::-webkit-scrollbar { display: none; }
         .text-item { font-size: 14px; color: #666; padding: 0 5px; }
         .text-item.active { color: var(--primary-color); font-weight: bold; }
 
-        /* ================= 图标分类导航 (十个带图的格子) ================= */
+        /* ================= 图标分类导航 ================= */
         .icon-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 0; padding: 15px 0; background: #fff; }
         .icon-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #333; }
         .icon-item img { width: 45px; height: 45px; object-fit: cover; margin-bottom: 6px; border-radius: 8px; }
-        .icon-item span { white-space: nowrap; } /* 防止文字换行 */
+        .icon-item span { white-space: nowrap; }
 
-        /* ================= 公告栏 ================= */
+        /* ================= 公告与活动块 ================= */
         .notice-bar { padding: 10px 15px; background: #fff; margin-top: 10px; display: flex; align-items: center; font-size: 12px; color: var(--text-sub); }
         .notice-icon { background: var(--primary-color); color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; margin-right: 8px; font-size: 10px; }
 
-        /* ================= 广告促销块 ================= */
         .promo-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; background: #fff; }
         .promo-card { border-radius: 8px; padding: 15px; color: #fff; height: 85px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
         .promo-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; z-index: 1; }
         .promo-content { position: relative; z-index: 2; }
         .promo-card h3 { font-size: 16px; margin-bottom: 4px; letter-spacing: 1px; }
         .promo-card span { font-size: 10px; opacity: 0.9; }
-        /* 使用真实图片做背景，加渐变遮罩保证文字清晰 */
         .promo-1 { background: url('https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80') center/cover; }
         .promo-1::before { background: linear-gradient(to right, rgba(160,30,30,0.8), rgba(160,30,30,0.4)); }
         .promo-2 { background: url('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&q=80') center/cover; }
@@ -99,7 +97,34 @@
         .news-img { width: 100%; height: 180px; border-radius: 8px; object-fit: cover; margin-bottom: 10px; }
         .news-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sub); }
 
-        /* ================= 商品详情页 (独立页) ================= */
+        /* ================= 会员中心页 (新增) ================= */
+        .member-header-container { background: #deac76; padding: 15px 20px 30px; }
+        .member-top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .member-top-nav .home-icon { font-size: 20px; color: #333; }
+        .member-top-nav .page-title { font-size: 18px; font-weight: bold; color: #333; }
+        .member-top-nav .more-btn { background: rgba(255,255,255,0.4); border-radius: 15px; padding: 2px 10px; font-size: 12px; color: #333; letter-spacing: 2px;}
+        .member-actions { display: flex; gap: 15px; font-size: 20px; color: #fff; margin-bottom: 15px; }
+        
+        .user-card { background: linear-gradient(135deg, #ffffff, #fdfbf9); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .user-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .login-text { font-size: 20px; font-weight: bold; }
+        .avatar { width: 60px; height: 60px; border-radius: 50%; background: #eee; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;}
+        .user-stats { display: flex; justify-content: space-between; text-align: center; }
+        .stat-item { flex: 1; }
+        .stat-item .val { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+        .stat-item .lbl { font-size: 12px; color: var(--text-sub); }
+
+        .withdraw-notice { background: #fff; padding: 15px; text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 10px; }
+
+        .member-section { background: #fff; margin: 10px 15px; border-radius: 12px; padding: 15px; }
+        .member-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .member-section-header h3 { font-size: 16px; font-weight: bold; }
+        .member-section-header .more { font-size: 12px; color: var(--text-sub); }
+        .member-icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 0; }
+        .member-icon-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #666; }
+        .member-icon-item i { font-size: 24px; margin-bottom: 6px; font-style: normal; opacity: 0.8;}
+
+        /* ================= 商品详情页 ================= */
         .detail-header { position: absolute; top: 15px; left: 15px; z-index: 101; background: rgba(0,0,0,0.4); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
         .detail-img-box { width: 100%; height: 350px; background: #fff; }
         .detail-img-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -123,12 +148,12 @@
         .tab-icon { font-size: 24px; margin-bottom: 2px; font-style: normal; }
 
         /* ================= 登录弹窗 ================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: center; align-items: center; }
-        .modal-box { background: #fff; width: 80%; max-width: 320px; border-radius: 12px; padding: 30px 20px; text-align: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .modal-box { background: #fff; width: 80%; max-width: 320px; border-radius: 16px; padding: 30px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .modal-icon { width: 80px; height: 80px; background: url('https://images.unsplash.com/photo-1533611762193-4e4b513dc981?w=200&q=80') center/cover; margin: 0 auto 20px; border-radius: 50%; }
         .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
         .modal-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 30px; }
-        .btn-login { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px 0; border-radius: 25px; font-size: 16px; margin-bottom: 15px; }
+        .btn-login { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px 0; border-radius: 25px; font-size: 16px; margin-bottom: 15px; font-weight: bold;}
         .btn-cancel { background: transparent; border: none; color: var(--text-sub); font-size: 14px; }
 
     </style>
@@ -145,7 +170,7 @@
             </div>
         </div>
         
-        <!-- 1. 新增轮播图 -->
+        <!-- 轮播图 -->
         <div class="carousel-container">
             <div class="carousel-inner" id="carousel-inner">
                 <img src="https://images.unsplash.com/photo-1552337399-3bb1d9f40739?w=800&q=80" alt="Banner 1">
@@ -161,7 +186,7 @@
             </div>
         </div>
         
-        <!-- 2. 分离的纯文字分类导航栏 -->
+        <!-- 分类的纯文字导航栏 -->
         <div class="text-nav">
             <div class="text-item active">全部分类</div>
             <div class="text-item">珍贵木制</div>
@@ -170,15 +195,13 @@
             <div class="text-item">雕刻艺术</div>
         </div>
 
-        <!-- 3. 十个图文小图标分类栏 -->
+        <!-- 图文小图标分类栏 -->
         <div class="icon-nav">
-            <!-- 第一排 -->
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1542104523-2895fc30689b?w=200&q=80" alt=""><span>联盟商家</span></div>
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?w=200&q=80" alt=""><span>生态伙伴</span></div>
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=200&q=80" alt=""><span>积分商城</span></div>
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1553150259-22a7f05b8281?w=200&q=80" alt=""><span>大师手作</span></div>
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=200&q=80" alt=""><span>私人定制</span></div>
-            <!-- 第二排 -->
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=200&q=80" alt=""><span>礼品专区</span></div>
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=200&q=80" alt=""><span>爆款专区</span></div>
             <div class="icon-item"><img src="https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=200&q=80" alt=""><span>名奢专区</span></div>
@@ -220,26 +243,6 @@
                     </div>
                 </div>
             </div>
-            <div class="product-card">
-                <img class="product-img" src="https://images.unsplash.com/photo-1615672412854-c98b64a22b07?w=400&q=80" alt="商品">
-                <div class="product-info">
-                    <div class="product-title">创意珐琅彩陶瓷空酒瓶5斤礼盒装景德镇...</div>
-                    <div class="product-bottom">
-                        <div class="product-price">134.00</div>
-                        <button class="buy-btn" onclick="goToDetail()">购买</button>
-                    </div>
-                </div>
-            </div>
-            <div class="product-card">
-                <img class="product-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&q=80" alt="商品">
-                <div class="product-info">
-                    <div class="product-title">多彩葫芦陶瓷小摆件精品福禄吉祥招财把玩...</div>
-                    <div class="product-bottom">
-                        <div class="product-price">29.90</div>
-                        <button class="buy-btn" onclick="goToDetail()">购买</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -257,12 +260,6 @@
             <div class="master-card"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&q=80" alt=""><div class="master-name">孙艳玲<br>满绣第四代传承人</div></div>
             <div class="master-card"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80" alt=""><div class="master-name">任志国<br>蔚县剪纸传承人</div></div>
             <div class="master-card"><img src="https://images.unsplash.com/photo-1531123897727-8f129e1bfa82?w=300&q=80" alt=""><div class="master-name">刘嘉峰<br>刘氏竹编创作大师</div></div>
-        </div>
-
-        <div class="section-title"><span>工艺美术 <br><small style="color:#ccc; font-weight:normal;">GONGYIMEISHU</small></span> <span class="more">查看更多 &gt;</span></div>
-        <div class="master-scroll">
-            <div class="master-card"><img src="https://images.unsplash.com/photo-1554151228-14d9def656e4?w=300&q=80" alt=""><div class="master-name">邬建美<br>正高级艺术设计</div></div>
-            <div class="master-card"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80" alt=""><div class="master-name">孙亚青<br>正高级工艺师</div></div>
         </div>
     </div>
 
@@ -295,8 +292,89 @@
         </div>
     </div>
 
+    <!-- ================= 页面4：会员中心 (完全根据图14重构) ================= -->
+    <div id="page-member" class="page-container" style="background: #f5f5f5;">
+        <div class="member-header-container">
+            <!-- 顶部导航 -->
+            <div class="member-top-nav">
+                <span class="home-icon">🏠</span>
+                <span class="page-title">会员中心</span>
+                <span class="more-btn">•• ⦿</span>
+            </div>
+            <!-- 设置与消息图标 -->
+            <div class="member-actions">
+                <span>⚙️</span>
+                <span>💬</span>
+            </div>
+            
+            <!-- 用户信息卡片 -->
+            <div class="user-card" onclick="triggerLoginModal()">
+                <div class="user-info-top">
+                    <div class="login-text">点击登录</div>
+                    <!-- 默认占位头像 -->
+                    <img class="avatar" src="https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80" alt="avatar">
+                </div>
+                <div class="user-stats">
+                    <div class="stat-item"><div class="val">*</div><div class="lbl">积分</div></div>
+                    <div class="stat-item"><div class="val">*</div><div class="lbl">余额</div></div>
+                    <div class="stat-item"><div class="val">*</div><div class="lbl">优惠券</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提现通知栏 -->
+        <div class="withdraw-notice">
+            提现到银行卡须提交身份证号码（点击填写）
+        </div>
+
+        <!-- 我的订单 -->
+        <div class="member-section">
+            <div class="member-section-header">
+                <h3>我的订单</h3>
+                <span class="more">全部订单 &gt;</span>
+            </div>
+            <div class="member-icon-grid">
+                <div class="member-icon-item"><i>👛</i><span>待付款</span></div>
+                <div class="member-icon-item"><i>📦</i><span>待发货</span></div>
+                <div class="member-icon-item"><i>🚚</i><span>待收货</span></div>
+                <div class="member-icon-item"><i>💬</i><span>待评价</span></div>
+                <div class="member-icon-item"><i>↩️</i><span>退换货</span></div>
+            </div>
+        </div>
+
+        <!-- 我的应用 -->
+        <div class="member-section">
+            <div class="member-section-header">
+                <h3>我的应用</h3>
+            </div>
+            <div class="member-icon-grid">
+                <!-- 第一排 -->
+                <div class="member-icon-item"><i>🏢</i><span>销售中心</span></div>
+                <div class="member-icon-item"><i>💰</i><span>会员押金</span></div>
+                <div class="member-icon-item"><i>🏪</i><span>独立开店</span></div>
+                <div class="member-icon-item"><i>👥</i><span>代理开店</span></div>
+                <div class="member-icon-item"><i>🤝</i><span>大师入住</span></div>
+                <!-- 第二排 -->
+                <div class="member-icon-item"><i>🔖</i><span>我的收藏</span></div>
+                <div class="member-icon-item"><i>🛒</i><span>购物车</span></div>
+                <div class="member-icon-item"><i>🏘️</i><span>我的社区</span></div>
+                <div class="member-icon-item"><i>👣</i><span>我的足迹</span></div>
+                <div class="member-icon-item"><i>📍</i><span>收货地址</span></div>
+            </div>
+        </div>
+
+        <!-- 我的卡券 -->
+        <div class="member-section">
+            <div class="member-section-header">
+                <h3>我的卡券</h3>
+                <span class="more">全部卡券 &gt;</span>
+            </div>
+        </div>
+    </div>
+
     <!-- ================= 底部导航栏 ================= -->
     <div class="tab-bar">
+        <!-- 默认不传第三个参数 -->
         <div class="tab-item active" onclick="switchTab('home', this)">
             <i class="tab-icon">🏠</i><span>文商首页</span>
         </div>
@@ -306,7 +384,8 @@
         <div class="tab-item" onclick="switchTab('news', this)">
             <i class="tab-icon">💬</i><span>社群资讯</span>
         </div>
-        <div class="tab-item" onclick="triggerLoginModal()">
+        <!-- 点击第四个导航栏时，传入 true，代表切换完页面后立刻弹出登录框 -->
+        <div class="tab-item" onclick="switchTab('member', this, true)">
             <i class="tab-icon">👤</i><span>会员中心</span>
         </div>
     </div>
@@ -326,10 +405,8 @@
     </div>
 
     <div class="detail-options"><span>快递: 免运费</span> <span>销量: 108</span> <span>库存: 10</span></div>
-    <div class="detail-options" style="margin-top: 10px;"><b>请选择</b> <span style="color: #999;">共1种规格可选 &gt;</span></div>
-    <div class="detail-options"><b>商品评价</b> <span style="color: #999;">查看全部 &gt;</span></div>
-
-    <!-- 详情页底部操作栏 -->
+    
+    <!-- 详情页底部操作栏 (也会触发登录) -->
     <div class="detail-bottom-bar">
         <div class="icon-btn"><i>🏠</i>店铺</div>
         <div class="icon-btn"><i>🛒</i>购物车</div>
@@ -348,21 +425,30 @@
         <div class="modal-title">您还未登录</div>
         <div class="modal-desc">请先登录再进行操作</div>
         <button class="btn-login" onclick="closeLoginModal()">立即登录</button>
+        <!-- 点击“我再看看”只关闭弹窗，底下的页面由于在触发时已经切换，所以会留在当前页 -->
         <button class="btn-cancel" onclick="closeLoginModal()">我再看看</button>
     </div>
 </div>
 
 <script>
     // 底部导航栏切换逻辑
-    function switchTab(tabId, element) {
+    // 新增 showLoginModal 参数，用于判断切换完页面后是否需要立即弹出登录框
+    function switchTab(tabId, element, showLoginModal = false) {
         document.querySelectorAll('.page-container').forEach(page => {
             page.classList.remove('active');
         });
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.classList.remove('active');
         });
+        
+        // 真正切换到对应的页面（包括会员中心）
         document.getElementById('page-' + tabId).classList.add('active');
         element.classList.add('active');
+
+        // 如果传入了需要弹出登录框（如图13的需求）
+        if(showLoginModal) {
+            triggerLoginModal();
+        }
     }
 
     // 弹窗逻辑
@@ -377,12 +463,10 @@
     const carouselInner = document.getElementById('carousel-inner');
     const dots = document.querySelectorAll('.carousel-indicators .dot');
     let currentIndex = 0;
-    const totalSlides = 4; // 图片总数
+    const totalSlides = 4;
 
     function showSlide(index) {
-        // 移动内层容器
         carouselInner.style.transform = `translateX(-${index * 25}%)`;
-        // 更新原点状态
         dots.forEach((dot, i) => {
             dot.classList.toggle('active', i === index);
         });
@@ -392,8 +476,6 @@
         currentIndex = (currentIndex + 1) % totalSlides;
         showSlide(currentIndex);
     }
-
-    // 设置每 3.5 秒自动轮播一次
     setInterval(nextSlide, 3500);
 
 </script>
