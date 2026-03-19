@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>非遗文商平台 v4.0</title>
+    <title>非遗文商平台 & 后台管理</title>
     <style>
         /* ================= 基础重置与变量 ================= */
         :root { --primary-color: #c43c33; --bg-color: #f5f5f5; --text-main: #333333; --text-sub: #999999; --gold-color: #d4a36b; }
@@ -105,7 +105,7 @@
         .order-list-item { background: #fff; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .order-status { float: right; color: var(--primary-color); font-size: 14px; font-weight: bold;}
 
-        /* ================= 登录/注册弹窗 ================= */
+        /* ================= 登录/注册 弹窗 ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .modal-box { background: #fff; width: 85%; max-width: 320px; border-radius: 12px; padding: 25px 20px; position: relative;}
         .modal-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; }
@@ -116,29 +116,61 @@
         .btn-submit { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px; border-radius: 25px; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
         .btn-close-modal { position: absolute; top: 10px; right: 15px; font-size: 20px; color: #999; cursor: pointer; }
 
-        /* ================= 管理员后台界面 (PC端布局) ================= */
+        /* ========================================================== */
+        /* ================= 管理员后台界面 (基础样式) ================= */
+        /* ========================================================== */
         #admin-dashboard { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f0f2f5; z-index: 2000; display: none; flex-direction: row; }
         .admin-sidebar { width: 220px; background: #001529; color: #fff; display: flex; flex-direction: column; }
         .admin-logo { padding: 20px; font-size: 20px; font-weight: bold; text-align: center; border-bottom: 1px solid #1a293b; letter-spacing: 2px;}
         .admin-menu { flex: 1; padding-top: 20px; }
         .admin-menu-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; color: #a6adb4; }
         .admin-menu-item:hover, .admin-menu-item.active { background: #1890ff; color: #fff; }
-        .admin-logout { padding: 15px; text-align: center; background: #ff4d4f; cursor: pointer; }
+        .admin-logout-desktop { padding: 15px; text-align: center; background: #ff4d4f; cursor: pointer; }
+        .admin-logout-mobile { display: none; } /* 移动端退出按钮默认隐藏 */
         
         .admin-content { flex: 1; overflow-y: auto; padding: 20px; }
         .admin-panel { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: none; min-height: 80vh;}
         .admin-panel.active { display: block; }
         .admin-panel h2 { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
         
-        /* 后台表格与表单 */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #fafafa; font-weight: bold; }
+        /* 表单与按钮 */
         .admin-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #fff; margin-right: 5px;}
         .btn-blue { background: #1890ff; } .btn-green { background: #52c41a; } .btn-orange { background: #fa8c16; } .btn-red { background: #ff4d4f; }
-        
         .admin-form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: center;}
         .admin-form-row input, .admin-form-row textarea { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+
+        /* 表格基础样式与响应式包裹层 */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 650px; /* 确保表格在手机上能横向滑动而不被过度压缩 */ }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background: #fafafa; font-weight: bold; }
+
+        /* ========================================================== */
+        /* ================= 后台移动端适配核心代码 ================= */
+        /* ========================================================== */
+        @media (max-width: 768px) {
+            #admin-dashboard { flex-direction: column; } /* 侧边栏和内容改为上下排列 */
+            .admin-sidebar { width: 100%; height: auto; flex-direction: column; }
+            
+            /* Logo 区域变为顶栏，包含退出按钮 */
+            .admin-logo { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; text-align: left; font-size: 18px; letter-spacing: 1px; }
+            .admin-logout-desktop { display: none; } /* 隐藏电脑端底部退出按钮 */
+            .admin-logout-mobile { display: block; background: #ff4d4f; color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; letter-spacing: 0; }
+            
+            /* 菜单变为横向可滑动 */
+            .admin-menu { display: flex; flex-direction: row; padding: 0; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #ddd; }
+            .admin-menu-item { padding: 12px 20px; flex: 1; text-align: center; }
+            
+            /* 内容区域间距调整 */
+            .admin-content { padding: 10px; width: 100%; box-sizing: border-box; }
+            .admin-panel { padding: 15px; min-height: calc(100vh - 120px); }
+            .admin-panel h2 { font-size: 18px; margin-bottom: 15px; }
+            
+            /* 适配添加商品表单为上下结构 */
+            .admin-form-row { flex-direction: column; gap: 10px; align-items: stretch; margin-bottom: 10px; }
+            .admin-form-row input, .admin-form-row textarea { width: 100%; }
+            .admin-form-row button { margin-top: 5px; height: 44px !important; width: 100%; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -322,7 +354,7 @@
             <button class="btn-submit" onclick="doLogin()">立即登录</button>
         </div>
 
-        <!-- 注册表单 (仅限普通用户) -->
+        <!-- 注册表单 -->
         <div id="form-register" class="auth-form" style="display:none;">
             <input type="text" id="reg-account" placeholder="设置账号">
             <input type="password" id="reg-password" placeholder="设置密码">
@@ -332,16 +364,21 @@
     </div>
 </div>
 
-<!-- ================= 纯PC端：管理员后台系统 ================= -->
+<!-- ================= 纯PC端：管理员后台系统 (已适配移动端) ================= -->
 <div id="admin-dashboard">
     <div class="admin-sidebar">
-        <div class="admin-logo">非遗后台管理</div>
+        <div class="admin-logo">
+            非遗后台管理
+            <!-- 专为移动端准备的退出按钮 -->
+            <span class="admin-logout-mobile" onclick="logoutAdmin()">退出</span>
+        </div>
         <div class="admin-menu">
             <div class="admin-menu-item active" onclick="switchAdminTab('products', this)">📦 商品管理</div>
             <div class="admin-menu-item" onclick="switchAdminTab('orders', this)">📝 订单管理</div>
             <div class="admin-menu-item" onclick="switchAdminTab('users', this)">👥 用户管理</div>
         </div>
-        <div class="admin-logout" onclick="logoutAdmin()">退出后台系统</div>
+        <!-- 桌面端保留在底部的退出按钮 -->
+        <div class="admin-logout-desktop" onclick="logoutAdmin()">退出后台系统</div>
     </div>
     
     <div class="admin-content">
@@ -362,28 +399,37 @@
                     <button class="admin-btn btn-blue" style="height:50px; padding:0 30px;" onclick="adminAddProduct()">+ 添加商品</button>
                 </div>
             </div>
-            <table id="admin-product-table">
-                <thead><tr><th>ID</th><th>图片</th><th>名称</th><th>价格</th><th>操作</th></tr></thead>
-                <tbody></tbody>
-            </table>
+            <!-- 加入 table-responsive 包裹层解决手机表格溢出问题 -->
+            <div class="table-responsive">
+                <table id="admin-product-table">
+                    <thead><tr><th>ID</th><th>图片</th><th>名称</th><th>价格</th><th>操作</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- 2. 订单管理 -->
         <div id="admin-orders" class="admin-panel">
             <h2>商品订单管理</h2>
-            <table id="admin-order-table">
-                <thead><tr><th>订单号</th><th>购买用户</th><th>商品名称</th><th>收货地址</th><th>支付方式</th><th>状态</th><th>操作</th></tr></thead>
-                <tbody></tbody>
-            </table>
+            <!-- 加入 table-responsive 包裹层解决手机表格溢出问题 -->
+            <div class="table-responsive">
+                <table id="admin-order-table">
+                    <thead><tr><th>订单号</th><th>购买用户</th><th>商品名称</th><th>收货地址</th><th>支付方式</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
 
         <!-- 3. 用户信息管理 -->
         <div id="admin-users" class="admin-panel">
             <h2>用户信息管理</h2>
-            <table id="admin-user-table">
-                <thead><tr><th>角色</th><th>账号</th><th>密码</th><th>头像</th><th>收货地址</th><th>操作</th></tr></thead>
-                <tbody></tbody>
-            </table>
+            <!-- 加入 table-responsive 包裹层解决手机表格溢出问题 -->
+            <div class="table-responsive">
+                <table id="admin-user-table">
+                    <thead><tr><th>角色</th><th>账号</th><th>密码</th><th>头像</th><th>收货地址</th><th>操作</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -402,11 +448,9 @@
         orders:[]
     };
 
-    // 获取存储数据或使用默认值
     function getData(key) { return JSON.parse(localStorage.getItem(key)) || defaultData[key]; }
     function setData(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
-    // 初始化数据库
     if(!localStorage.getItem('users')) setData('users', defaultData.users);
     if(!localStorage.getItem('products')) setData('products', defaultData.products);
     if(!localStorage.getItem('orders')) setData('orders', defaultData.orders);
@@ -420,7 +464,6 @@
         updateMemberUI();
     }
 
-    // 渲染首页商品
     function renderHomeProducts() {
         const products = getData('products');
         const container = document.getElementById('home-product-list');
@@ -438,22 +481,19 @@
         `).join('');
     }
 
-    // 更新会员中心UI & 订单徽标角标
     function updateMemberUI() {
         if(currentUser && currentUser.role === 'user') {
             document.getElementById('member-username').innerText = currentUser.account;
             document.getElementById('member-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1533611762193-4e4b513dc981?w=200&q=80';
             document.getElementById('btn-logout').style.display = 'block';
             
-            // 统计订单角标
             const orders = getData('orders').filter(o => o.userAccount === currentUser.account);
             const counts = { shipment: 0, receipt: 0, review: 0 };
             orders.forEach(o => {
                 if(o.status === 'pending_shipment') counts.shipment++;
                 if(o.status === 'pending_receipt') counts.receipt++;
                 if(o.status === 'pending_review') counts.review++;
-            });
-            ['shipment', 'receipt', 'review'].forEach(type => {
+            });['shipment', 'receipt', 'review'].forEach(type => {
                 const el = document.getElementById(`badge-${type}`);
                 el.innerText = counts[type];
                 el.style.display = counts[type] > 0 ? 'inline-block' : 'none';
@@ -503,7 +543,6 @@
         document.getElementById('checkout-title').innerText = p.name;
         document.getElementById('checkout-price').innerText = `¥ ${p.price}`;
         document.getElementById('checkout-total').innerText = `¥ ${p.price}`;
-        // 首次购买回显保存的地址
         document.getElementById('checkout-address').value = currentUser.address || '';
         document.getElementById('page-checkout').style.display = 'block';
     }
@@ -514,7 +553,6 @@
         
         if(!address) { alert('请填写收货地址！'); return; }
 
-        // 保存地址到用户资料 (首次购买后收录到后台)
         let users = getData('users');
         let userIdx = users.findIndex(u => u.account === currentUser.account);
         users[userIdx].address = address;
@@ -522,7 +560,6 @@
         currentUser.address = address;
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-        // 生成订单保存至后台
         let orders = getData('orders');
         const newOrder = {
             id: 'ORD' + new Date().getTime(),
@@ -532,7 +569,7 @@
             price: currentViewingProduct.price,
             address: address,
             payMethod: payMethod === 'WeChat' ? '微信支付' : '支付宝',
-            status: 'pending_shipment', // 待发货
+            status: 'pending_shipment', 
             date: new Date().toLocaleString()
         };
         orders.push(newOrder);
@@ -542,11 +579,9 @@
         closeFullPage('page-checkout');
         closeFullPage('page-detail');
         updateMemberUI();
-        // 自动切回会员中心
         document.querySelectorAll('.tab-item')[3].click(); 
     }
 
-    // ================= 前台逻辑：查看订单 =================
     const statusMap = { 'pending_shipment': '待发货', 'pending_receipt': '待收货 (已发货)', 'pending_review': '待评价 (已完成)' };
     
     function showUserOrders(statusFilter) {
@@ -625,13 +660,11 @@
         updateMemberUI();
     }
 
-    // ==========================================================
-    // ================= 纯PC端：管理员后台逻辑 =================
-    // ==========================================================
+    // ================= 管理员后台逻辑 =================
 
     function initAdmin() {
-        document.getElementById('app').style.display = 'none'; // 隐藏前台手机壳
-        document.getElementById('admin-dashboard').style.display = 'flex'; // 显示宽屏后台
+        document.getElementById('app').style.display = 'none'; 
+        document.getElementById('admin-dashboard').style.display = 'flex'; 
         renderAdminProducts();
         renderAdminOrders();
         renderAdminUsers();
@@ -648,13 +681,11 @@
         document.querySelectorAll('.admin-panel').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
         document.getElementById('admin-' + tab).classList.add('active');
-        // 切换时重新拉取数据渲染
         if(tab==='products') renderAdminProducts();
         if(tab==='orders') renderAdminOrders();
         if(tab==='users') renderAdminUsers();
     }
 
-    // 后台：1. 商品管理
     function renderAdminProducts() {
         const products = getData('products');
         const tbody = document.querySelector('#admin-product-table tbody');
@@ -678,7 +709,7 @@
         const desc = document.getElementById('add-prod-desc').value;
         
         if(!name || !price) { alert('商品名称和价格必填！'); return; }
-        if(!img) img = 'https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=400&q=80'; // 默认图
+        if(!img) img = 'https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=400&q=80'; 
 
         const products = getData('products');
         const newId = products.length > 0 ? Math.max(...products.map(p=>p.id)) + 1 : 1;
@@ -686,9 +717,8 @@
         setData('products', products);
         
         renderAdminProducts();
-        renderHomeProducts(); // 实时同步到前台
+        renderHomeProducts(); 
         
-        // 清空表单
         document.getElementById('add-prod-name').value = ''; document.getElementById('add-prod-price').value = '';
         document.getElementById('add-prod-img').value = ''; document.getElementById('add-prod-desc').value = '';
         alert('商品添加成功！已同步至前台推荐商品列表。');
@@ -702,7 +732,6 @@
         renderHomeProducts();
     }
 
-    // 后台：2. 订单管理
     function renderAdminOrders() {
         const orders = getData('orders');
         const tbody = document.querySelector('#admin-order-table tbody');
@@ -717,7 +746,7 @@
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${o.address}</td>
                 <td>${o.payMethod}</td>
                 <td style="color:${o.status==='pending_shipment'?'red':'#52c41a'}; font-weight:bold;">${statusMap[o.status]}</td>
-                <td>
+                <td style="white-space:nowrap;">
                     ${o.status === 'pending_shipment' ? `<button class="admin-btn btn-blue" onclick="adminProcessOrder('${o.id}', 'pending_receipt')">去发货</button>` : ''}
                     ${o.status === 'pending_receipt' ? `<button class="admin-btn btn-green" onclick="adminProcessOrder('${o.id}', 'pending_review')">标记完成</button>` : ''}
                     ${o.status === 'pending_review' ? `<span style="font-size:12px; color:#999;">无操作</span>` : ''}
@@ -734,21 +763,20 @@
             setData('orders', orders);
             renderAdminOrders();
             alert('订单状态已更新！前台会员中心状态同步改变。');
-            updateMemberUI(); // 更新前台角标
+            updateMemberUI(); 
         }
     }
 
-    // 后台：3. 用户信息管理
     function renderAdminUsers() {
         const users = getData('users');
         const tbody = document.querySelector('#admin-user-table tbody');
         tbody.innerHTML = users.map(u => `
             <tr>
-                <td>${u.role === 'admin' ? '<span style="color:red;font-weight:bold;">管理员</span>' : '普通用户'}</td>
+                <td style="white-space:nowrap;">${u.role === 'admin' ? '<span style="color:red;font-weight:bold;">管理员</span>' : '普通用户'}</td>
                 <td>${u.account}</td>
                 <td>${u.password}</td>
                 <td><img src="${u.avatar || 'https://via.placeholder.com/40'}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"></td>
-                <td>${u.address || '<span style="color:#ccc;">暂未填写</span>'}</td>
+                <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${u.address || '<span style="color:#ccc;">暂未填写</span>'}</td>
                 <td>
                     <button class="admin-btn btn-orange" onclick="adminEditUser('${u.account}')">修改资料</button>
                 </td>
@@ -773,9 +801,7 @@
         alert('用户信息修改成功！');
     }
 
-    // ================= 执行初始化 =================
     initApp();
-    // 轮播图自动播放
     setInterval(() => {
         let ci = document.getElementById('carousel-inner');
         let currentTransform = ci.style.transform;
@@ -784,7 +810,6 @@
         ci.style.transform = `translateX(-${index * 25}%)`;
     }, 3500);
 
-    // 如果初始化进来就是管理员，直接进后台
     if(currentUser && currentUser.role === 'admin') {
         initAdmin();
     }
