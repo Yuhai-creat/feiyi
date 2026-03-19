@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>非遗文商平台</title>
+    <style>
+        /* ================= 基础重置与变量 ================= */
+        :root {
+            --primary-color: #c43c33; /* 传统红 */
+            --bg-color: #f5f5f5;
+            --text-main: #333333;
+            --text-sub: #999999;
+            --gold-color: #d4a36b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, Helvetica, sans-serif; background-color: var(--bg-color); color: var(--text-main); }
+        ul, li { list-style: none; }
+        a { text-decoration: none; color: inherit; }
+
+        /* ================= 页面布局容器 ================= */
+        #app { width: 100vw; height: 100vh; overflow: hidden; position: relative; }
+        .page-container { height: calc(100vh - 60px); overflow-y: auto; display: none; background: var(--bg-color); padding-bottom: 20px;}
+        .page-container.active { display: block; }
+        .full-page { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #fff; z-index: 100; display: none; overflow-y: auto; }
+
+        /* ================= 顶部搜索与导航 ================= */
+        .header { display: flex; align-items: center; padding: 10px 15px; background: #fff; position: sticky; top: 0; z-index: 10; }
+        .logo { color: var(--primary-color); font-weight: bold; font-size: 20px; margin-right: 15px; font-family: serif; }
+        .search-bar { flex: 1; background: #f0e6d2; border-radius: 20px; padding: 8px 15px; display: flex; align-items: center; color: #a08c70; font-size: 14px; }
+        .search-bar input { border: none; background: transparent; outline: none; width: 100%; margin-left: 5px;}
+        .header-icons { display: flex; gap: 15px; margin-left: 15px; font-size: 20px;}
+
+        /* ================= 公共组件 ================= */
+        .banner { width: 100%; height: 160px; background: url('https://via.placeholder.com/600x300/8b0000/ffffff?text=非遗文化轮播图') center/cover; }
+        .section-title { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; margin-top: 10px; font-weight: bold; }
+        .section-title .more { font-size: 12px; color: var(--text-sub); font-weight: normal; }
+
+        /* ================= 首页 (文商首页) ================= */
+        .category-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; background: #fff; text-align: center; font-size: 12px; }
+        .category-item img { width: 40px; height: 40px; border-radius: 50%; margin-bottom: 5px; background: #eee; }
+        
+        .promo-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; background: #fff; }
+        .promo-card { border-radius: 8px; padding: 15px; color: #fff; height: 80px; display: flex; flex-direction: column; justify-content: center; background-size: cover; }
+        .promo-1 { background: linear-gradient(to right, #a03c3c, #c45a5a); }
+        .promo-2 { background: linear-gradient(to right, #c49a5a, #dcb689); }
+        .promo-3 { background: linear-gradient(to right, #3a6b6b, #5a8c8c); }
+        .promo-4 { background: linear-gradient(to right, #3a6b4c, #5a8c6b); }
+
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; }
+        .product-card { background: #fff; border-radius: 8px; overflow: hidden; padding-bottom: 10px; display: flex; flex-direction: column;}
+        .product-img { width: 100%; height: 160px; background: #eee; object-fit: cover;}
+        .product-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-size: 14px; line-height: 1.4; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-bottom { display: flex; justify-content: space-between; align-items: center; }
+        .product-price { color: var(--primary-color); font-weight: bold; font-size: 16px; }
+        .product-price::before { content: '¥'; font-size: 12px; }
+        .buy-btn { background: #dcb689; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 12px; border: none; }
+
+        /* ================= 大师名家页 ================= */
+        .master-scroll { display: flex; overflow-x: auto; padding: 10px 15px; background: #fff; gap: 10px; padding-bottom: 20px; }
+        .master-scroll::-webkit-scrollbar { display: none; }
+        .master-card { min-width: 120px; position: relative; border-radius: 8px; overflow: hidden; }
+        .master-card img { width: 100%; height: 150px; object-fit: cover; }
+        .master-name { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.5); color: #fff; text-align: center; padding: 5px 0; font-size: 12px; }
+
+        /* ================= 社群资讯页 ================= */
+        .news-list { background: #fff; }
+        .news-item { padding: 15px; border-bottom: 1px solid #eee; }
+        .news-title { font-size: 16px; margin-bottom: 10px; font-weight: bold; line-height: 1.4; }
+        .news-img { width: 100%; height: 180px; border-radius: 8px; object-fit: cover; margin-bottom: 10px; background: #eee;}
+        .news-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sub); }
+
+        /* ================= 商品详情页 (独立页) ================= */
+        .detail-header { position: absolute; top: 15px; left: 15px; z-index: 101; background: rgba(0,0,0,0.4); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .detail-img-box { width: 100%; height: 350px; background: #fff; }
+        .detail-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        .detail-info { background: #fff; padding: 15px; margin-bottom: 10px; }
+        .detail-price-row { display: flex; justify-content: space-between; align-items: center; color: var(--primary-color); font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .detail-price-row span { font-size: 16px; }
+        .detail-title { font-size: 16px; font-weight: bold; line-height: 1.5; margin-bottom: 15px; }
+        .detail-options { background: #fff; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; color: var(--text-sub); font-size: 14px; border-bottom: 1px solid #eee;}
+        
+        .detail-bottom-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; padding: 0 10px; z-index: 101; }
+        .icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text-sub); width: 50px; }
+        .icon-btn i { font-size: 18px; margin-bottom: 2px; font-style: normal; }
+        .action-btns { flex: 1; display: flex; margin-left: 10px; gap: 10px; }
+        .btn-cart { flex: 1; background: #5a6b7c; color: #fff; border: none; border-radius: 20px; height: 40px; font-size: 14px; }
+        .btn-buy { flex: 1; background: #dcb689; color: #fff; border: none; border-radius: 20px; height: 40px; font-size: 14px; }
+
+        /* ================= 底部导航栏 ================= */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #fff; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; z-index: 50; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 12px; padding: 5px 0; }
+        .tab-item.active { color: var(--primary-color); }
+        .tab-icon { font-size: 24px; margin-bottom: 2px; font-style: normal; }
+
+        /* ================= 登录弹窗 ================= */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: center; align-items: center; }
+        .modal-box { background: #fff; width: 80%; max-width: 320px; border-radius: 12px; padding: 30px 20px; text-align: center; }
+        .modal-icon { width: 80px; height: 80px; background: url('https://via.placeholder.com/80x80/f0f0f0/cccccc?text=灯塔') center/cover; margin: 0 auto 20px; border-radius: 50%; }
+        .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .modal-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 30px; }
+        .btn-login { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px 0; border-radius: 25px; font-size: 16px; margin-bottom: 15px; }
+        .btn-cancel { background: transparent; border: none; color: var(--text-sub); font-size: 14px; }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- ================= 页面1：文商首页 ================= -->
+    <div id="page-home" class="page-container active">
+        <div class="header">
+            <div class="logo">非遗</div>
+            <div class="search-bar">
+                <span>🔍</span> <input type="text" placeholder="文商精选">
+            </div>
+        </div>
+        
+        <div class="banner"></div>
+        
+        <div class="category-nav">
+            <div class="category-item"><img src="" alt="">全部分类</div>
+            <div class="category-item"><img src="" alt="">珍贵木制</div>
+            <div class="category-item"><img src="" alt="">漆器工艺</div>
+            <div class="category-item"><img src="" alt="">紫砂陶瓷</div>
+            <div class="category-item"><img src="" alt="">雕刻艺术</div>
+            <div class="category-item"><img src="" alt="">联盟商家</div>
+            <div class="category-item"><img src="" alt="">生态伙伴</div>
+            <div class="category-item"><img src="" alt="">积分商城</div>
+            <div class="category-item"><img src="" alt="">大师手作</div>
+            <div class="category-item"><img src="" alt="">私人定制</div>
+        </div>
+
+        <div style="padding: 10px 15px; background: #fff; margin-top: 10px; display: flex; align-items: center; font-size: 12px; color: var(--text-sub);">
+            <span style="background: var(--primary-color); color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; margin-right: 5px;">📢</span>
+            平台活动可以获得大量积分奖励，积分可兑换商品...
+        </div>
+
+        <div class="promo-blocks">
+            <div class="promo-card promo-1"><h3>非遗传承</h3><span style="font-size: 10px;">非遗精品 点击购买 ▶</span></div>
+            <div class="promo-card promo-2"><h3>工艺美术</h3><span style="font-size: 10px;">美术精品 点击购买 ▶</span></div>
+            <div class="promo-card promo-3"><h3>书画名家</h3><span style="font-size: 10px;">名家精品 点击购买 ▶</span></div>
+            <div class="promo-card promo-4"><h3>手工匠人</h3><span style="font-size: 10px;">匠人精品 点击购买 ▶</span></div>
+        </div>
+
+        <div style="text-align: center; padding: 15px 0; color: #666;">—— 商品推荐 ——</div>
+        
+        <div class="product-grid">
+            <!-- 商品卡片 -->
+            <div class="product-card">
+                <img class="product-img" src="https://via.placeholder.com/200x200/333/fff?text=金箔蝴蝶标本" alt="商品">
+                <div class="product-info">
+                    <div class="product-title">金箔蝴蝶标本成品美凤蝶标本手工七夕...</div>
+                    <div class="product-bottom">
+                        <div class="product-price">182.90</div>
+                        <button class="buy-btn" onclick="goToDetail()">购买</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 商品卡片 -->
+            <div class="product-card">
+                <img class="product-img" src="https://via.placeholder.com/200x200/8b0000/fff?text=人参礼盒" alt="商品">
+                <div class="product-info">
+                    <div class="product-title">人参礼盒吉祥如意四宝礼盒过节春节礼...</div>
+                    <div class="product-bottom">
+                        <div class="product-price">139.00</div>
+                        <button class="buy-btn" onclick="goToDetail()">购买</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 商品卡片 -->
+            <div class="product-card">
+                <img class="product-img" src="https://via.placeholder.com/200x200/1e90ff/fff?text=珐琅彩酒瓶" alt="商品">
+                <div class="product-info">
+                    <div class="product-title">创意珐琅彩陶瓷空酒瓶5斤礼盒装景德镇...</div>
+                    <div class="product-bottom">
+                        <div class="product-price">134.00</div>
+                        <button class="buy-btn" onclick="goToDetail()">购买</button>
+                    </div>
+                </div>
+            </div>
+            <!-- 商品卡片 -->
+            <div class="product-card">
+                <img class="product-img" src="https://via.placeholder.com/200x200/daa520/fff?text=葫芦摆件" alt="商品">
+                <div class="product-info">
+                    <div class="product-title">多彩葫芦陶瓷小摆件精品福禄吉祥招财...</div>
+                    <div class="product-bottom">
+                        <div class="product-price">29.90</div>
+                        <button class="buy-btn" onclick="goToDetail()">购买</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 页面2：大师名家 ================= -->
+    <div id="page-masters" class="page-container">
+        <div class="header">
+            <div class="search-bar" style="background: #eee;">
+                <span>🔍</span> <input type="text" placeholder="搜索商品/大师">
+            </div>
+        </div>
+        <div class="banner" style="height: 200px; background: url('https://via.placeholder.com/600x400/ccc/333?text=大师入驻申请') center/cover;"></div>
+        
+        <!-- 分类模块 -->
+        <div class="section-title"><span>非遗传承 <br><small style="color:#ccc; font-weight:normal;">FEIYICHUANCHENG</small></span> <span class="more">查看更多 &gt;</span></div>
+        <div class="master-scroll">
+            <div class="master-card"><img src="https://via.placeholder.com/150x200/f08080/fff?text=孙艳玲" alt=""><div class="master-name">孙艳玲<br>满绣第四代传承人</div></div>
+            <div class="master-card"><img src="https://via.placeholder.com/150x200/a9a9a9/fff?text=任志国" alt=""><div class="master-name">任志国<br>蔚县剪纸传承人</div></div>
+            <div class="master-card"><img src="https://via.placeholder.com/150x200/696969/fff?text=刘嘉峰" alt=""><div class="master-name">刘嘉峰<br>刘氏竹编创作</div></div>
+        </div>
+
+        <div class="section-title"><span>工艺美术 <br><small style="color:#ccc; font-weight:normal;">GONGYIMEISHU</small></span> <span class="more">查看更多 &gt;</span></div>
+        <div class="master-scroll">
+            <div class="master-card"><img src="https://via.placeholder.com/150x200/ffa07a/fff?text=邬建美" alt=""><div class="master-name">邬建美<br>正高级艺术创意...</div></div>
+            <div class="master-card"><img src="https://via.placeholder.com/150x200/20b2aa/fff?text=孙亚青" alt=""><div class="master-name">孙亚青<br>正高级工艺美术师</div></div>
+        </div>
+    </div>
+
+    <!-- ================= 页面3：社群资讯 ================= -->
+    <div id="page-news" class="page-container">
+        <div class="header">
+            <div class="search-bar" style="background: #eee;">
+                <span>🔍</span> <input type="text" placeholder="搜索你感兴趣的资讯">
+            </div>
+            <button style="background:var(--primary-color); color:white; border:none; padding:8px 15px; border-radius:4px; margin-left:10px;">搜索</button>
+        </div>
+
+        <div class="news-list">
+            <div class="news-item">
+                <div class="news-title">【北京地志人文探索】</div>
+                <img class="news-img" src="https://via.placeholder.com/600x300/8b0000/fff?text=天安门" alt="资讯">
+                <div class="news-meta">
+                    <span>2025-01-28 21:15</span>
+                    <span>👁 172 &nbsp; 👍 66</span>
+                </div>
+            </div>
+            <div class="news-item">
+                <div class="news-title">国家级非遗满族刺绣第四代传承人——孙艳玲</div>
+                <img class="news-img" src="https://via.placeholder.com/600x300/cd5c5c/fff?text=刺绣大师" alt="资讯">
+                <div class="news-meta">
+                    <span>2025-01-19 15:07</span>
+                    <span>👁 3473 &nbsp; 👍 2547</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 底部导航栏 ================= -->
+    <div class="tab-bar">
+        <!-- 移除了“本地生活” -->
+        <div class="tab-item active" onclick="switchTab('home', this)">
+            <i class="tab-icon">🏠</i><span>文商首页</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('masters', this)">
+            <i class="tab-icon">🪭</i><span>大师名家</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('news', this)">
+            <i class="tab-icon">💬</i><span>社群资讯</span>
+        </div>
+        <div class="tab-item" onclick="triggerLoginModal()">
+            <i class="tab-icon">👤</i><span>会员中心</span>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 独立页：商品详情页 (图11) ================= -->
+<div id="page-detail" class="full-page">
+    <div class="detail-header" onclick="goBackFromDetail()">&lt;</div>
+    
+    <div class="detail-img-box">
+        <img src="https://via.placeholder.com/600x600/8b0000/fff?text=人参吉祥如意礼盒" alt="商品大图">
+    </div>
+    
+    <div class="detail-info">
+        <div class="detail-price-row">¥ 139.00 <span style="color:var(--text-sub); display:flex; gap:15px;"><i style="font-style:normal;">🔗 分享</i><i style="font-style:normal;">⭐ 收藏</i></span></div>
+        <div class="detail-title">人参礼盒吉祥如意四宝礼盒过节春节礼盒林下参紫灵芝鹿鞭鹿茸</div>
+    </div>
+
+    <div class="detail-options"><span>快递: 免运费</span> <span>销量: 0</span> <span>库存: 10</span></div>
+    <div class="detail-options"><b>请选择</b> <span>共1种规格可选 &gt;</span></div>
+    <div class="detail-options"><b>暂无评价</b> <span>查看全部 &gt;</span></div>
+
+    <!-- 详情页底部操作栏 -->
+    <div class="detail-bottom-bar">
+        <div class="icon-btn"><i>🏠</i>店铺</div>
+        <div class="icon-btn"><i>🛒</i>购物车</div>
+        <div class="icon-btn"><i>🎧</i>客服</div>
+        <div class="action-btns">
+            <!-- 点击加购或购买都触发登录弹窗 (图12) -->
+            <button class="btn-cart" onclick="triggerLoginModal()">加入购物车</button>
+            <button class="btn-buy" onclick="triggerLoginModal()">立即购买</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================= 登录提示弹窗 (图10 & 图12) ================= -->
+<div id="login-modal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-icon"></div>
+        <div class="modal-title">您还未登录</div>
+        <div class="modal-desc">请先登录再进行操作</div>
+        <button class="btn-login" onclick="closeLoginModal()">立即登录</button>
+        <button class="btn-cancel" onclick="closeLoginModal()">我再看看</button>
+    </div>
+</div>
+
+<script>
+    // 底部导航栏切换逻辑
+    function switchTab(tabId, element) {
+        // 隐藏所有页面
+        document.querySelectorAll('.page-container').forEach(page => {
+            page.classList.remove('active');
+        });
+        // 移除所有导航项的高亮
+        document.querySelectorAll('.tab-item').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // 显示目标页面
+        document.getElementById('page-' + tabId).classList.add('active');
+        // 高亮当前点击的导航项
+        element.classList.add('active');
+    }
+
+    // 触发登录弹窗 (首页底部导航、详情页购买按钮共用)
+    function triggerLoginModal() {
+        document.getElementById('login-modal').style.display = 'flex';
+    }
+
+    // 关闭登录弹窗
+    function closeLoginModal() {
+        document.getElementById('login-modal').style.display = 'none';
+    }
+
+    // 跳转到商品详情页
+    function goToDetail() {
+        document.getElementById('page-detail').style.display = 'block';
+    }
+
+    // 从商品详情页返回
+    function goBackFromDetail() {
+        document.getElementById('page-detail').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
