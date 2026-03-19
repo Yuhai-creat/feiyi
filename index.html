@@ -7,7 +7,7 @@
     <style>
         /* ================= 基础重置与变量 ================= */
         :root {
-            --primary-color: #c43c33; /* 传统红 */
+            --primary-color: #c43c33; 
             --bg-color: #f5f5f5;
             --text-main: #333333;
             --text-sub: #999999;
@@ -29,27 +29,54 @@
         .logo { color: var(--primary-color); font-weight: bold; font-size: 20px; margin-right: 15px; font-family: serif; }
         .search-bar { flex: 1; background: #f0e6d2; border-radius: 20px; padding: 8px 15px; display: flex; align-items: center; color: #a08c70; font-size: 14px; }
         .search-bar input { border: none; background: transparent; outline: none; width: 100%; margin-left: 5px;}
-        .header-icons { display: flex; gap: 15px; margin-left: 15px; font-size: 20px;}
 
-        /* ================= 公共组件 ================= */
-        .banner { width: 100%; height: 160px; background: url('https://via.placeholder.com/600x300/8b0000/ffffff?text=非遗文化轮播图') center/cover; }
+        /* ================= 轮播图 (新增) ================= */
+        .carousel-container { position: relative; width: 100%; height: 180px; overflow: hidden; background: #eee; }
+        .carousel-inner { display: flex; width: 400%; height: 100%; transition: transform 0.4s ease-in-out; }
+        .carousel-inner img { width: 25%; height: 100%; object-fit: cover; }
+        .carousel-indicators { position: absolute; bottom: 12px; width: 100%; display: flex; justify-content: center; gap: 8px; }
+        .dot { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; transition: all 0.3s; }
+        .dot.active { background: #fff; width: 15px; border-radius: 3px; }
+
+        /* ================= 文字分类导航 (独立一行) ================= */
+        .text-nav { display: flex; justify-content: space-around; align-items: center; padding: 12px 10px; background: #fff; border-bottom: 1px solid #f0f0f0; overflow-x: auto; white-space: nowrap; }
+        .text-nav::-webkit-scrollbar { display: none; }
+        .text-item { font-size: 14px; color: #666; padding: 0 5px; }
+        .text-item.active { color: var(--primary-color); font-weight: bold; }
+
+        /* ================= 图标分类导航 (十个带图的格子) ================= */
+        .icon-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 0; padding: 15px 0; background: #fff; }
+        .icon-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #333; }
+        .icon-item img { width: 45px; height: 45px; object-fit: cover; margin-bottom: 6px; border-radius: 8px; }
+        .icon-item span { white-space: nowrap; } /* 防止文字换行 */
+
+        /* ================= 公告栏 ================= */
+        .notice-bar { padding: 10px 15px; background: #fff; margin-top: 10px; display: flex; align-items: center; font-size: 12px; color: var(--text-sub); }
+        .notice-icon { background: var(--primary-color); color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; margin-right: 8px; font-size: 10px; }
+
+        /* ================= 广告促销块 ================= */
+        .promo-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; background: #fff; }
+        .promo-card { border-radius: 8px; padding: 15px; color: #fff; height: 85px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+        .promo-card::before { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; z-index: 1; }
+        .promo-content { position: relative; z-index: 2; }
+        .promo-card h3 { font-size: 16px; margin-bottom: 4px; letter-spacing: 1px; }
+        .promo-card span { font-size: 10px; opacity: 0.9; }
+        /* 使用真实图片做背景，加渐变遮罩保证文字清晰 */
+        .promo-1 { background: url('https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=400&q=80') center/cover; }
+        .promo-1::before { background: linear-gradient(to right, rgba(160,30,30,0.8), rgba(160,30,30,0.4)); }
+        .promo-2 { background: url('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&q=80') center/cover; }
+        .promo-2::before { background: linear-gradient(to right, rgba(190,140,80,0.8), rgba(190,140,80,0.4)); }
+        .promo-3 { background: url('https://images.unsplash.com/photo-1580136608260-4ebf152d1bc6?w=400&q=80') center/cover; }
+        .promo-3::before { background: linear-gradient(to right, rgba(30,100,100,0.8), rgba(30,100,100,0.4)); }
+        .promo-4 { background: url('https://images.unsplash.com/photo-1528164344705-47542687000d?w=400&q=80') center/cover; }
+        .promo-4::before { background: linear-gradient(to right, rgba(50,110,70,0.8), rgba(50,110,70,0.4)); }
+
+        /* ================= 商品列表 ================= */
         .section-title { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; margin-top: 10px; font-weight: bold; }
         .section-title .more { font-size: 12px; color: var(--text-sub); font-weight: normal; }
-
-        /* ================= 首页 (文商首页) ================= */
-        .category-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; background: #fff; text-align: center; font-size: 12px; }
-        .category-item img { width: 40px; height: 40px; border-radius: 50%; margin-bottom: 5px; background: #eee; }
-        
-        .promo-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; background: #fff; }
-        .promo-card { border-radius: 8px; padding: 15px; color: #fff; height: 80px; display: flex; flex-direction: column; justify-content: center; background-size: cover; }
-        .promo-1 { background: linear-gradient(to right, #a03c3c, #c45a5a); }
-        .promo-2 { background: linear-gradient(to right, #c49a5a, #dcb689); }
-        .promo-3 { background: linear-gradient(to right, #3a6b6b, #5a8c8c); }
-        .promo-4 { background: linear-gradient(to right, #3a6b4c, #5a8c6b); }
-
         .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; }
-        .product-card { background: #fff; border-radius: 8px; overflow: hidden; padding-bottom: 10px; display: flex; flex-direction: column;}
-        .product-img { width: 100%; height: 160px; background: #eee; object-fit: cover;}
+        .product-card { background: #fff; border-radius: 8px; overflow: hidden; padding-bottom: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .product-img { width: 100%; height: 160px; object-fit: cover;}
         .product-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
         .product-title { font-size: 14px; line-height: 1.4; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .product-bottom { display: flex; justify-content: space-between; align-items: center; }
@@ -58,46 +85,47 @@
         .buy-btn { background: #dcb689; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 12px; border: none; }
 
         /* ================= 大师名家页 ================= */
+        .master-banner { width: 100%; height: 200px; background: url('https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800&q=80') center/cover; }
         .master-scroll { display: flex; overflow-x: auto; padding: 10px 15px; background: #fff; gap: 10px; padding-bottom: 20px; }
         .master-scroll::-webkit-scrollbar { display: none; }
         .master-card { min-width: 120px; position: relative; border-radius: 8px; overflow: hidden; }
-        .master-card img { width: 100%; height: 150px; object-fit: cover; }
-        .master-name { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.5); color: #fff; text-align: center; padding: 5px 0; font-size: 12px; }
+        .master-card img { width: 100%; height: 160px; object-fit: cover; }
+        .master-name { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: #fff; text-align: center; padding: 15px 5px 5px; font-size: 12px; }
 
         /* ================= 社群资讯页 ================= */
         .news-list { background: #fff; }
-        .news-item { padding: 15px; border-bottom: 1px solid #eee; }
+        .news-item { padding: 15px; border-bottom: 1px solid #f0f0f0; }
         .news-title { font-size: 16px; margin-bottom: 10px; font-weight: bold; line-height: 1.4; }
-        .news-img { width: 100%; height: 180px; border-radius: 8px; object-fit: cover; margin-bottom: 10px; background: #eee;}
+        .news-img { width: 100%; height: 180px; border-radius: 8px; object-fit: cover; margin-bottom: 10px; }
         .news-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sub); }
 
         /* ================= 商品详情页 (独立页) ================= */
-        .detail-header { position: absolute; top: 15px; left: 15px; z-index: 101; background: rgba(0,0,0,0.4); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+        .detail-header { position: absolute; top: 15px; left: 15px; z-index: 101; background: rgba(0,0,0,0.4); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
         .detail-img-box { width: 100%; height: 350px; background: #fff; }
-        .detail-img-box img { width: 100%; height: 100%; object-fit: contain; }
+        .detail-img-box img { width: 100%; height: 100%; object-fit: cover; }
         .detail-info { background: #fff; padding: 15px; margin-bottom: 10px; }
         .detail-price-row { display: flex; justify-content: space-between; align-items: center; color: var(--primary-color); font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .detail-price-row span { font-size: 16px; }
+        .detail-price-row span { font-size: 14px; }
         .detail-title { font-size: 16px; font-weight: bold; line-height: 1.5; margin-bottom: 15px; }
-        .detail-options { background: #fff; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; color: var(--text-sub); font-size: 14px; border-bottom: 1px solid #eee;}
+        .detail-options { background: #fff; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; color: var(--text-sub); font-size: 14px; border-bottom: 1px solid #f5f5f5;}
         
         .detail-bottom-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; padding: 0 10px; z-index: 101; }
         .icon-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--text-sub); width: 50px; }
         .icon-btn i { font-size: 18px; margin-bottom: 2px; font-style: normal; }
         .action-btns { flex: 1; display: flex; margin-left: 10px; gap: 10px; }
-        .btn-cart { flex: 1; background: #5a6b7c; color: #fff; border: none; border-radius: 20px; height: 40px; font-size: 14px; }
+        .btn-cart { flex: 1; background: #333; color: #fff; border: none; border-radius: 20px; height: 40px; font-size: 14px; }
         .btn-buy { flex: 1; background: #dcb689; color: #fff; border: none; border-radius: 20px; height: 40px; font-size: 14px; }
 
         /* ================= 底部导航栏 ================= */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #fff; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; z-index: 50; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 12px; padding: 5px 0; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 12px; padding: 5px 0; cursor: pointer; }
         .tab-item.active { color: var(--primary-color); }
         .tab-icon { font-size: 24px; margin-bottom: 2px; font-style: normal; }
 
         /* ================= 登录弹窗 ================= */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: center; align-items: center; }
         .modal-box { background: #fff; width: 80%; max-width: 320px; border-radius: 12px; padding: 30px 20px; text-align: center; }
-        .modal-icon { width: 80px; height: 80px; background: url('https://via.placeholder.com/80x80/f0f0f0/cccccc?text=灯塔') center/cover; margin: 0 auto 20px; border-radius: 50%; }
+        .modal-icon { width: 80px; height: 80px; background: url('https://images.unsplash.com/photo-1533611762193-4e4b513dc981?w=200&q=80') center/cover; margin: 0 auto 20px; border-radius: 50%; }
         .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
         .modal-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 30px; }
         .btn-login { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px 0; border-radius: 25px; font-size: 16px; margin-bottom: 15px; }
@@ -117,61 +145,83 @@
             </div>
         </div>
         
-        <div class="banner"></div>
+        <!-- 1. 新增轮播图 -->
+        <div class="carousel-container">
+            <div class="carousel-inner" id="carousel-inner">
+                <img src="https://images.unsplash.com/photo-1552337399-3bb1d9f40739?w=800&q=80" alt="Banner 1">
+                <img src="https://images.unsplash.com/photo-1580136608260-4ebf152d1bc6?w=800&q=80" alt="Banner 2">
+                <img src="https://images.unsplash.com/photo-1615672412854-c98b64a22b07?w=800&q=80" alt="Banner 3">
+                <img src="https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80" alt="Banner 4">
+            </div>
+            <div class="carousel-indicators">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
         
-        <div class="category-nav">
-            <div class="category-item"><img src="" alt="">全部分类</div>
-            <div class="category-item"><img src="" alt="">珍贵木制</div>
-            <div class="category-item"><img src="" alt="">漆器工艺</div>
-            <div class="category-item"><img src="" alt="">紫砂陶瓷</div>
-            <div class="category-item"><img src="" alt="">雕刻艺术</div>
-            <div class="category-item"><img src="" alt="">联盟商家</div>
-            <div class="category-item"><img src="" alt="">生态伙伴</div>
-            <div class="category-item"><img src="" alt="">积分商城</div>
-            <div class="category-item"><img src="" alt="">大师手作</div>
-            <div class="category-item"><img src="" alt="">私人定制</div>
+        <!-- 2. 分离的纯文字分类导航栏 -->
+        <div class="text-nav">
+            <div class="text-item active">全部分类</div>
+            <div class="text-item">珍贵木制</div>
+            <div class="text-item">漆器工艺</div>
+            <div class="text-item">紫砂陶瓷</div>
+            <div class="text-item">雕刻艺术</div>
         </div>
 
-        <div style="padding: 10px 15px; background: #fff; margin-top: 10px; display: flex; align-items: center; font-size: 12px; color: var(--text-sub);">
-            <span style="background: var(--primary-color); color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; margin-right: 5px;">📢</span>
-            平台活动可以获得大量积分奖励，积分可兑换商品...
+        <!-- 3. 十个图文小图标分类栏 -->
+        <div class="icon-nav">
+            <!-- 第一排 -->
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1542104523-2895fc30689b?w=200&q=80" alt=""><span>联盟商家</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?w=200&q=80" alt=""><span>生态伙伴</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=200&q=80" alt=""><span>积分商城</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1553150259-22a7f05b8281?w=200&q=80" alt=""><span>大师手作</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=200&q=80" alt=""><span>私人定制</span></div>
+            <!-- 第二排 -->
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=200&q=80" alt=""><span>礼品专区</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=200&q=80" alt=""><span>爆款专区</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=200&q=80" alt=""><span>名奢专区</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1616651213349-808620242cd1?w=200&q=80" alt=""><span>公益专区</span></div>
+            <div class="icon-item"><img src="https://images.unsplash.com/photo-1595166548766-32d5de8634bd?w=200&q=80" alt=""><span>免费专区</span></div>
+        </div>
+
+        <div class="notice-bar">
+            <span class="notice-icon">📢</span>平台活动可以获得大量积分奖励，积分可兑换商品...
         </div>
 
         <div class="promo-blocks">
-            <div class="promo-card promo-1"><h3>非遗传承</h3><span style="font-size: 10px;">非遗精品 点击购买 ▶</span></div>
-            <div class="promo-card promo-2"><h3>工艺美术</h3><span style="font-size: 10px;">美术精品 点击购买 ▶</span></div>
-            <div class="promo-card promo-3"><h3>书画名家</h3><span style="font-size: 10px;">名家精品 点击购买 ▶</span></div>
-            <div class="promo-card promo-4"><h3>手工匠人</h3><span style="font-size: 10px;">匠人精品 点击购买 ▶</span></div>
+            <div class="promo-card promo-1"><div class="promo-content"><h3>非遗传承</h3><span>非遗精品 点击购买 ▶</span></div></div>
+            <div class="promo-card promo-2"><div class="promo-content"><h3>工艺美术</h3><span>美术精品 点击购买 ▶</span></div></div>
+            <div class="promo-card promo-3"><div class="promo-content"><h3>书画名家</h3><span>名家精品 点击购买 ▶</span></div></div>
+            <div class="promo-card promo-4"><div class="promo-content"><h3>手工匠人</h3><span>匠人精品 点击购买 ▶</span></div></div>
         </div>
 
-        <div style="text-align: center; padding: 15px 0; color: #666;">—— 商品推荐 ——</div>
+        <div style="text-align: center; padding: 15px 0; color: #999; font-size: 14px;">—— 商品推荐 ——</div>
         
         <div class="product-grid">
-            <!-- 商品卡片 -->
             <div class="product-card">
-                <img class="product-img" src="https://via.placeholder.com/200x200/333/fff?text=金箔蝴蝶标本" alt="商品">
+                <img class="product-img" src="https://images.unsplash.com/photo-1555662800-8d5427ec7f41?w=400&q=80" alt="商品">
                 <div class="product-info">
-                    <div class="product-title">金箔蝴蝶标本成品美凤蝶标本手工七夕...</div>
+                    <div class="product-title">金箔蝴蝶标本成品美凤蝶标本手工七夕送礼...</div>
                     <div class="product-bottom">
                         <div class="product-price">182.90</div>
                         <button class="buy-btn" onclick="goToDetail()">购买</button>
                     </div>
                 </div>
             </div>
-            <!-- 商品卡片 -->
             <div class="product-card">
-                <img class="product-img" src="https://via.placeholder.com/200x200/8b0000/fff?text=人参礼盒" alt="商品">
+                <img class="product-img" src="https://images.unsplash.com/photo-1587049352847-4d4b17f6990b?w=400&q=80" alt="商品">
                 <div class="product-info">
-                    <div class="product-title">人参礼盒吉祥如意四宝礼盒过节春节礼...</div>
+                    <div class="product-title">人参礼盒吉祥如意四宝礼盒过节春节送长辈...</div>
                     <div class="product-bottom">
                         <div class="product-price">139.00</div>
                         <button class="buy-btn" onclick="goToDetail()">购买</button>
                     </div>
                 </div>
             </div>
-            <!-- 商品卡片 -->
             <div class="product-card">
-                <img class="product-img" src="https://via.placeholder.com/200x200/1e90ff/fff?text=珐琅彩酒瓶" alt="商品">
+                <img class="product-img" src="https://images.unsplash.com/photo-1615672412854-c98b64a22b07?w=400&q=80" alt="商品">
                 <div class="product-info">
                     <div class="product-title">创意珐琅彩陶瓷空酒瓶5斤礼盒装景德镇...</div>
                     <div class="product-bottom">
@@ -180,11 +230,10 @@
                     </div>
                 </div>
             </div>
-            <!-- 商品卡片 -->
             <div class="product-card">
-                <img class="product-img" src="https://via.placeholder.com/200x200/daa520/fff?text=葫芦摆件" alt="商品">
+                <img class="product-img" src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=400&q=80" alt="商品">
                 <div class="product-info">
-                    <div class="product-title">多彩葫芦陶瓷小摆件精品福禄吉祥招财...</div>
+                    <div class="product-title">多彩葫芦陶瓷小摆件精品福禄吉祥招财把玩...</div>
                     <div class="product-bottom">
                         <div class="product-price">29.90</div>
                         <button class="buy-btn" onclick="goToDetail()">购买</button>
@@ -197,31 +246,30 @@
     <!-- ================= 页面2：大师名家 ================= -->
     <div id="page-masters" class="page-container">
         <div class="header">
-            <div class="search-bar" style="background: #eee;">
+            <div class="search-bar" style="background: #f0f0f0;">
                 <span>🔍</span> <input type="text" placeholder="搜索商品/大师">
             </div>
         </div>
-        <div class="banner" style="height: 200px; background: url('https://via.placeholder.com/600x400/ccc/333?text=大师入驻申请') center/cover;"></div>
+        <div class="master-banner"></div>
         
-        <!-- 分类模块 -->
         <div class="section-title"><span>非遗传承 <br><small style="color:#ccc; font-weight:normal;">FEIYICHUANCHENG</small></span> <span class="more">查看更多 &gt;</span></div>
         <div class="master-scroll">
-            <div class="master-card"><img src="https://via.placeholder.com/150x200/f08080/fff?text=孙艳玲" alt=""><div class="master-name">孙艳玲<br>满绣第四代传承人</div></div>
-            <div class="master-card"><img src="https://via.placeholder.com/150x200/a9a9a9/fff?text=任志国" alt=""><div class="master-name">任志国<br>蔚县剪纸传承人</div></div>
-            <div class="master-card"><img src="https://via.placeholder.com/150x200/696969/fff?text=刘嘉峰" alt=""><div class="master-name">刘嘉峰<br>刘氏竹编创作</div></div>
+            <div class="master-card"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&q=80" alt=""><div class="master-name">孙艳玲<br>满绣第四代传承人</div></div>
+            <div class="master-card"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&q=80" alt=""><div class="master-name">任志国<br>蔚县剪纸传承人</div></div>
+            <div class="master-card"><img src="https://images.unsplash.com/photo-1531123897727-8f129e1bfa82?w=300&q=80" alt=""><div class="master-name">刘嘉峰<br>刘氏竹编创作大师</div></div>
         </div>
 
         <div class="section-title"><span>工艺美术 <br><small style="color:#ccc; font-weight:normal;">GONGYIMEISHU</small></span> <span class="more">查看更多 &gt;</span></div>
         <div class="master-scroll">
-            <div class="master-card"><img src="https://via.placeholder.com/150x200/ffa07a/fff?text=邬建美" alt=""><div class="master-name">邬建美<br>正高级艺术创意...</div></div>
-            <div class="master-card"><img src="https://via.placeholder.com/150x200/20b2aa/fff?text=孙亚青" alt=""><div class="master-name">孙亚青<br>正高级工艺美术师</div></div>
+            <div class="master-card"><img src="https://images.unsplash.com/photo-1554151228-14d9def656e4?w=300&q=80" alt=""><div class="master-name">邬建美<br>正高级艺术设计</div></div>
+            <div class="master-card"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80" alt=""><div class="master-name">孙亚青<br>正高级工艺师</div></div>
         </div>
     </div>
 
     <!-- ================= 页面3：社群资讯 ================= -->
     <div id="page-news" class="page-container">
         <div class="header">
-            <div class="search-bar" style="background: #eee;">
+            <div class="search-bar" style="background: #f0f0f0;">
                 <span>🔍</span> <input type="text" placeholder="搜索你感兴趣的资讯">
             </div>
             <button style="background:var(--primary-color); color:white; border:none; padding:8px 15px; border-radius:4px; margin-left:10px;">搜索</button>
@@ -229,16 +277,16 @@
 
         <div class="news-list">
             <div class="news-item">
-                <div class="news-title">【北京地志人文探索】</div>
-                <img class="news-img" src="https://via.placeholder.com/600x300/8b0000/fff?text=天安门" alt="资讯">
+                <div class="news-title">【北京地志人文探索】沉浸式体验古都风韵</div>
+                <img class="news-img" src="https://images.unsplash.com/photo-1508804052814-cd3ba865a116?w=800&q=80" alt="资讯">
                 <div class="news-meta">
                     <span>2025-01-28 21:15</span>
                     <span>👁 172 &nbsp; 👍 66</span>
                 </div>
             </div>
             <div class="news-item">
-                <div class="news-title">国家级非遗满族刺绣第四代传承人——孙艳玲</div>
-                <img class="news-img" src="https://via.placeholder.com/600x300/cd5c5c/fff?text=刺绣大师" alt="资讯">
+                <div class="news-title">国家级非遗满族刺绣第四代传承人——专访孙艳玲</div>
+                <img class="news-img" src="https://images.unsplash.com/photo-1551061921-3e0e7161b476?w=800&q=80" alt="资讯">
                 <div class="news-meta">
                     <span>2025-01-19 15:07</span>
                     <span>👁 3473 &nbsp; 👍 2547</span>
@@ -249,7 +297,6 @@
 
     <!-- ================= 底部导航栏 ================= -->
     <div class="tab-bar">
-        <!-- 移除了“本地生活” -->
         <div class="tab-item active" onclick="switchTab('home', this)">
             <i class="tab-icon">🏠</i><span>文商首页</span>
         </div>
@@ -265,12 +312,12 @@
     </div>
 </div>
 
-<!-- ================= 独立页：商品详情页 (图11) ================= -->
+<!-- ================= 独立页：商品详情页 ================= -->
 <div id="page-detail" class="full-page">
     <div class="detail-header" onclick="goBackFromDetail()">&lt;</div>
     
     <div class="detail-img-box">
-        <img src="https://via.placeholder.com/600x600/8b0000/fff?text=人参吉祥如意礼盒" alt="商品大图">
+        <img src="https://images.unsplash.com/photo-1587049352847-4d4b17f6990b?w=800&q=80" alt="商品大图">
     </div>
     
     <div class="detail-info">
@@ -278,9 +325,9 @@
         <div class="detail-title">人参礼盒吉祥如意四宝礼盒过节春节礼盒林下参紫灵芝鹿鞭鹿茸</div>
     </div>
 
-    <div class="detail-options"><span>快递: 免运费</span> <span>销量: 0</span> <span>库存: 10</span></div>
-    <div class="detail-options"><b>请选择</b> <span>共1种规格可选 &gt;</span></div>
-    <div class="detail-options"><b>暂无评价</b> <span>查看全部 &gt;</span></div>
+    <div class="detail-options"><span>快递: 免运费</span> <span>销量: 108</span> <span>库存: 10</span></div>
+    <div class="detail-options" style="margin-top: 10px;"><b>请选择</b> <span style="color: #999;">共1种规格可选 &gt;</span></div>
+    <div class="detail-options"><b>商品评价</b> <span style="color: #999;">查看全部 &gt;</span></div>
 
     <!-- 详情页底部操作栏 -->
     <div class="detail-bottom-bar">
@@ -288,14 +335,13 @@
         <div class="icon-btn"><i>🛒</i>购物车</div>
         <div class="icon-btn"><i>🎧</i>客服</div>
         <div class="action-btns">
-            <!-- 点击加购或购买都触发登录弹窗 (图12) -->
             <button class="btn-cart" onclick="triggerLoginModal()">加入购物车</button>
             <button class="btn-buy" onclick="triggerLoginModal()">立即购买</button>
         </div>
     </div>
 </div>
 
-<!-- ================= 登录提示弹窗 (图10 & 图12) ================= -->
+<!-- ================= 登录提示弹窗 ================= -->
 <div id="login-modal" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-icon"></div>
@@ -309,40 +355,47 @@
 <script>
     // 底部导航栏切换逻辑
     function switchTab(tabId, element) {
-        // 隐藏所有页面
         document.querySelectorAll('.page-container').forEach(page => {
             page.classList.remove('active');
         });
-        // 移除所有导航项的高亮
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.classList.remove('active');
         });
-
-        // 显示目标页面
         document.getElementById('page-' + tabId).classList.add('active');
-        // 高亮当前点击的导航项
         element.classList.add('active');
     }
 
-    // 触发登录弹窗 (首页底部导航、详情页购买按钮共用)
-    function triggerLoginModal() {
-        document.getElementById('login-modal').style.display = 'flex';
+    // 弹窗逻辑
+    function triggerLoginModal() { document.getElementById('login-modal').style.display = 'flex'; }
+    function closeLoginModal() { document.getElementById('login-modal').style.display = 'none'; }
+    
+    // 详情页跳转逻辑
+    function goToDetail() { document.getElementById('page-detail').style.display = 'block'; }
+    function goBackFromDetail() { document.getElementById('page-detail').style.display = 'none'; }
+
+    // ================= 轮播图实现逻辑 =================
+    const carouselInner = document.getElementById('carousel-inner');
+    const dots = document.querySelectorAll('.carousel-indicators .dot');
+    let currentIndex = 0;
+    const totalSlides = 4; // 图片总数
+
+    function showSlide(index) {
+        // 移动内层容器
+        carouselInner.style.transform = `translateX(-${index * 25}%)`;
+        // 更新原点状态
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
     }
 
-    // 关闭登录弹窗
-    function closeLoginModal() {
-        document.getElementById('login-modal').style.display = 'none';
+    function nextSlide() {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        showSlide(currentIndex);
     }
 
-    // 跳转到商品详情页
-    function goToDetail() {
-        document.getElementById('page-detail').style.display = 'block';
-    }
+    // 设置每 3.5 秒自动轮播一次
+    setInterval(nextSlide, 3500);
 
-    // 从商品详情页返回
-    function goBackFromDetail() {
-        document.getElementById('page-detail').style.display = 'none';
-    }
 </script>
 
 </body>
