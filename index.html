@@ -1,646 +1,1973 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>非遗文商平台 v6.5</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>艺数视界平台 v6.5</title>
     <style>
-        /* ================= 基础重置与变量 ================= */
-        :root { --primary-color: #c43c33; --bg-color: #f5f5f5; --text-main: #333333; --text-sub: #999999; --gold-color: #d4a36b; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, Helvetica, sans-serif; background-color: var(--bg-color); color: var(--text-main); }
-        ul, li { list-style: none; }
-        a { text-decoration: none; color: inherit; }
-        button { cursor: pointer; }
-        input, textarea { font-family: inherit; }
+      /* ================= 基础重置与变量 ================= */
+      :root {
+        --primary-color: #c43c33;
+        --bg-color: #f5f5f5;
+        --text-main: #333333;
+        --text-sub: #999999;
+        --gold-color: #d4a36b;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        font-family: -apple-system, Helvetica, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+      }
+      ul,
+      li {
+        list-style: none;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      input,
+      textarea {
+        font-family: inherit;
+      }
 
-        /* ================= 页面布局容器 (前台 APP) ================= */
-        #app { width: 100vw; height: 100vh; overflow: hidden; position: relative; max-width: 480px; margin: 0 auto; background: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .page-container { height: calc(100vh - 60px); overflow-y: auto; display: none; background: var(--bg-color); padding-bottom: 20px; }
-        .page-container.active { display: block; }
-        .full-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 100; display: none; overflow-y: auto; max-width: 480px; margin: 0 auto; right: 0; }
+      /* ================= 页面布局容器 (前台 APP) ================= */
+      #app {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+        max-width: 480px;
+        margin: 0 auto;
+        background: #fff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      .page-container {
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+        display: none;
+        background: var(--bg-color);
+        padding-bottom: 20px;
+      }
+      .page-container.active {
+        display: block;
+      }
+      .full-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        z-index: 100;
+        display: none;
+        overflow-y: auto;
+        max-width: 480px;
+        margin: 0 auto;
+        right: 0;
+      }
 
-        /* ================= 前台公共组件 ================= */
-        .header { display: flex; align-items: center; padding: 10px 15px; background: #fff; position: sticky; top: 0; z-index: 10; }
-        .logo { color: var(--primary-color); font-weight: bold; font-size: 20px; margin-right: 15px; font-family: serif; }
-        .search-bar { flex: 1; background: #f0e6d2; border-radius: 20px; padding: 8px 15px; display: flex; align-items: center; color: #a08c70; font-size: 14px; }
-        .search-bar input { border: none; background: transparent; outline: none; width: 100%; margin-left: 5px; }
-        
-        /* ================= 轮播图模块 ================= */
-        .carousel-container { position: relative; width: 100%; height: 180px; overflow: hidden; background: #eee; }
-        .carousel-inner { display: flex; width: 400%; height: 100%; transition: transform 0.4s ease-in-out; }
-        .carousel-inner img { width: 25%; height: 100%; object-fit: cover; }
-        
-        /* ================= 首页模块 ================= */
-        .text-nav { display: flex; justify-content: space-around; align-items: center; padding: 12px 10px; background: #fff; border-bottom: 1px solid #f0f0f0; overflow-x: auto; white-space: nowrap; }
-        .text-item { font-size: 14px; color: #666; padding: 0 5px; } .text-item.active { color: var(--primary-color); font-weight: bold; }
-        .icon-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 0; padding: 15px 0; background: #fff; }
-        .icon-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #333; }
-        .icon-item img { width: 45px; height: 45px; object-fit: cover; margin-bottom: 6px; border-radius: 8px; }
-        .notice-bar { padding: 10px 15px; background: #fff; margin-top: 10px; display: flex; align-items: center; font-size: 12px; color: var(--text-sub); }
-        .notice-icon { background: var(--primary-color); color: #fff; border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; margin-right: 8px; font-size: 10px; }
-        .promo-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; background: #fff; }
-        .promo-card { border-radius: 8px; padding: 15px; color: #fff; height: 85px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
-        .promo-card h3 { font-size: 16px; position: relative; z-index: 2;} .promo-card span { font-size: 10px; position: relative; z-index: 2;}
-        .promo-1 { background: linear-gradient(to right, #a03c3c, #c45a5a); } .promo-2 { background: linear-gradient(to right, #c49a5a, #dcb689); }
-        .promo-3 { background: linear-gradient(to right, #3a6b6b, #5a8c8c); } .promo-4 { background: linear-gradient(to right, #3a6b4c, #5a8c6b); }
-        
-        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px 15px; }
-        .product-card { background: #fff; border-radius: 8px; overflow: hidden; padding-bottom: 10px; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .product-img { width: 100%; height: 160px; object-fit: cover;}
-        .product-info { padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-title { font-size: 14px; line-height: 1.4; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .product-bottom { display: flex; justify-content: space-between; align-items: center; }
-        .product-price { color: var(--primary-color); font-weight: bold; font-size: 16px; } .product-price::before { content: '¥'; font-size: 12px; }
-        .buy-btn { background: #dcb689; color: #fff; padding: 4px 12px; border-radius: 4px; font-size: 12px; border: none; }
+      /* ================= 前台公共组件 ================= */
+      .header {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        background: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .logo {
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 20px;
+        margin-right: 15px;
+        font-family: serif;
+      }
+      .search-bar {
+        flex: 1;
+        background: #f0e6d2;
+        border-radius: 20px;
+        padding: 8px 15px;
+        display: flex;
+        align-items: center;
+        color: #a08c70;
+        font-size: 14px;
+      }
+      .search-bar input {
+        border: none;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        margin-left: 5px;
+      }
 
-        /* ================= 修改点：大师名家页全新样式 ================= */
-        .section-title { padding: 15px; background: #fff; margin-top: 10px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f9f9f9;}
-        .master-scroll { display: flex; overflow-x: auto; padding: 15px; background: #fff; gap: 12px; padding-bottom: 20px; }
-        .master-scroll::-webkit-scrollbar { display: none; } /* 隐藏滑动条 */
-        
-        /* 全新大师卡片排版样式 */
-        .master-card-new { min-width: 145px; display: flex; flex-direction: column; background: #fff; }
-        .master-card-img-box { position: relative; width: 100%; height: 180px; border-radius: 8px; overflow: hidden; background: #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .master-card-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .master-card-name { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: #fff; text-align: center; padding: 25px 0 8px; font-size: 14px; font-weight: bold; letter-spacing: 1px;}
-        .master-card-title { font-size: 12px; color: #555; text-align: center; padding-top: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .apply-banner { width: 100%; display: block; margin: 10px 0; }
+      /* ================= 轮播图模块 ================= */
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: #eee;
+      }
+      .carousel-inner {
+        display: flex;
+        width: 400%;
+        height: 100%;
+        transition: transform 0.4s ease-in-out;
+      }
+      .carousel-inner img {
+        width: 25%;
+        height: 100%;
+        object-fit: cover;
+      }
 
-        /* ================= 社群资讯 ================= */
-        .news-item { padding: 15px; border-bottom: 1px solid #eee; background: #fff; } .news-img { width: 100%; height: 180px; border-radius: 8px; object-fit: cover; margin-top: 10px;}
+      /* ================= 首页模块 ================= */
+      .text-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 12px 10px;
+        background: #fff;
+        border-bottom: 1px solid #f0f0f0;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .text-item {
+        font-size: 14px;
+        color: #666;
+        padding: 0 5px;
+      }
+      .text-item.active {
+        color: var(--primary-color);
+        font-weight: bold;
+      }
+      .icon-nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px 0;
+        padding: 15px 0;
+        background: #fff;
+      }
+      .icon-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 12px;
+        color: #333;
+      }
+      .icon-item img {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        margin-bottom: 6px;
+        border-radius: 8px;
+      }
+      .notice-bar {
+        padding: 10px 15px;
+        background: #fff;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        color: var(--text-sub);
+      }
+      .notice-icon {
+        background: var(--primary-color);
+        color: #fff;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 8px;
+        font-size: 10px;
+      }
+      .promo-blocks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 10px 15px;
+        background: #fff;
+      }
+      .promo-card {
+        border-radius: 8px;
+        padding: 15px;
+        color: #fff;
+        height: 85px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .promo-card h3 {
+        font-size: 16px;
+        position: relative;
+        z-index: 2;
+      }
+      .promo-card span {
+        font-size: 10px;
+        position: relative;
+        z-index: 2;
+      }
+      .promo-1 {
+        background: linear-gradient(to right, #a03c3c, #c45a5a);
+      }
+      .promo-2 {
+        background: linear-gradient(to right, #c49a5a, #dcb689);
+      }
+      .promo-3 {
+        background: linear-gradient(to right, #3a6b6b, #5a8c8c);
+      }
+      .promo-4 {
+        background: linear-gradient(to right, #3a6b4c, #5a8c6b);
+      }
 
-        /* ================= 会员中心 ================= */
-        .member-header-container { background: #deac76; padding: 15px 20px 30px; position: relative; }
-        .member-top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: #333; font-size: 18px; font-weight: bold;}
-        .user-card { background: linear-gradient(135deg, #ffffff, #fdfbf9); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 10px;}
-        .user-info-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .login-text { font-size: 20px; font-weight: bold; }
-        .avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); object-fit: cover;}
-        .user-stats { display: flex; justify-content: space-between; text-align: center; } .stat-item { flex: 1; } .stat-item .val { font-size: 18px; font-weight: bold; margin-bottom: 4px; } .stat-item .lbl { font-size: 12px; color: var(--text-sub); }
-        .action-btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
-        .logout-btn { background: rgba(0,0,0,0.08); color: #333; border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; cursor: pointer; transition: 0.2s;}
-        .logout-btn:hover { background: rgba(0,0,0,0.15); }
-        .member-section { background: #fff; margin: 10px 15px; border-radius: 12px; padding: 15px; }
-        .member-icon-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px 0; margin-top: 15px;}
-        .member-icon-item { display: flex; flex-direction: column; align-items: center; font-size: 12px; color: #666; cursor: pointer; position: relative;}
-        .member-icon-item i { font-size: 24px; margin-bottom: 6px; font-style: normal;}
-        .badge { position: absolute; top: -5px; right: 5px; background: red; color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; display: none;}
+      .product-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding: 10px 15px;
+      }
+      .product-card {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        padding-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+      .product-img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+      }
+      .product-info {
+        padding: 10px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .product-title {
+        font-size: 14px;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .product-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .product-price {
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .product-price::before {
+        content: "¥";
+        font-size: 12px;
+      }
+      .buy-btn {
+        background: #dcb689;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        border: none;
+      }
 
-        /* ================= 底部导航栏 ================= */
-        .tab-bar { position: absolute; bottom: 0; width: 100%; height: 60px; background: #fff; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; z-index: 50; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); font-size: 12px; cursor: pointer; } .tab-item.active { color: var(--primary-color); } .tab-icon { font-size: 24px; font-style: normal; }
+      /* ================= 大师名家页全新样式 ================= */
+      .section-title {
+        padding: 15px;
+        background: #fff;
+        margin-top: 10px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #f9f9f9;
+      }
+      .master-scroll {
+        display: flex;
+        overflow-x: auto;
+        padding: 15px;
+        background: #fff;
+        gap: 12px;
+        padding-bottom: 20px;
+      }
+      .master-scroll::-webkit-scrollbar {
+        display: none;
+      }
+      .master-card-new {
+        min-width: 145px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      .master-card-img-box {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #eee;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .master-card-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .master-card-name {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        color: #fff;
+        text-align: center;
+        padding: 25px 0 8px;
+        font-size: 14px;
+        font-weight: bold;
+        letter-spacing: 1px;
+      }
+      .master-card-title {
+        font-size: 12px;
+        color: #555;
+        text-align: center;
+        padding-top: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
 
-        /* ================= 商品详情页 ================= */
-        .detail-header { position: absolute; top: 15px; left: 15px; z-index: 101; background: rgba(0,0,0,0.4); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; }
-        .detail-img-box { width: 100%; height: 350px; background: #fff; } .detail-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .detail-info { background: #fff; padding: 15px; margin-bottom: 10px; }
-        .detail-price-row { color: var(--primary-color); font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .detail-title { font-size: 16px; font-weight: bold; line-height: 1.5; margin-bottom: 10px; }
-        .detail-desc { font-size: 14px; color: #666; line-height: 1.6; padding: 15px; background: #fff; margin-bottom: 60px; }
-        .detail-bottom-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; padding: 0 10px; z-index: 101; max-width: 480px; }
-        .action-btns { flex: 1; display: flex; margin-left: 10px; gap: 10px; } .btn-cart { flex: 1; background: #333; color: #fff; border: none; border-radius: 20px; height: 40px; } .btn-buy { flex: 1; background: #dcb689; color: #fff; border: none; border-radius: 20px; height: 40px; }
+      /* ================= 社群资讯 ================= */
+      .news-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        background: #fff;
+      }
+      .news-img {
+        width: 100%;
+        height: 180px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-top: 10px;
+      }
 
-        /* ================= 结算页 (Checkout) ================= */
-        .checkout-header { text-align: center; padding: 15px; font-size: 18px; font-weight: bold; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0;}
-        .checkout-section { background: #fff; margin-bottom: 10px; padding: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;}
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        .payment-method { display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; cursor: pointer;}
-        .payment-method input { margin-right: 10px; transform: scale(1.2); }
-        .pay-footer { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; }
-        .pay-btn { background: var(--primary-color); color: #fff; padding: 10px 30px; border-radius: 20px; border: none; font-size: 16px; font-weight: bold;}
+      /* ================= 会员中心 ================= */
+      .member-header-container {
+        background: #deac76;
+        padding: 15px 20px 30px;
+        position: relative;
+      }
+      .member-top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .user-card {
+        background: linear-gradient(135deg, #ffffff, #fdfbf9);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-top: 10px;
+      }
+      .user-info-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .login-text {
+        font-size: 20px;
+        font-weight: bold;
+      }
+      .avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        object-fit: cover;
+      }
+      .user-stats {
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+      }
+      .stat-item {
+        flex: 1;
+      }
+      .stat-item .val {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+      .stat-item .lbl {
+        font-size: 12px;
+        color: var(--text-sub);
+      }
+      .action-btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+      .logout-btn {
+        background: rgba(0, 0, 0, 0.08);
+        color: #333;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .logout-btn:hover {
+        background: rgba(0, 0, 0, 0.15);
+      }
+      .member-section {
+        background: #fff;
+        margin: 10px 15px;
+        border-radius: 12px;
+        padding: 15px;
+      }
+      .member-icon-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px 0;
+        margin-top: 15px;
+      }
+      .member-icon-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+        position: relative;
+      }
+      .member-icon-item i {
+        font-size: 24px;
+        margin-bottom: 6px;
+        font-style: normal;
+      }
+      .badge {
+        position: absolute;
+        top: -5px;
+        right: 5px;
+        background: red;
+        color: white;
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 10px;
+        display: none;
+      }
 
-        /* ================= 订单列表弹层 ================= */
-        .order-list-item { background: #fff; margin: 10px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .order-status { float: right; color: var(--primary-color); font-size: 14px; font-weight: bold;}
+      /* ================= 底部导航栏 ================= */
+      .tab-bar {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        background: #fff;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 50;
+      }
+      .tab-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--text-sub);
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .tab-item.active {
+        color: var(--primary-color);
+      }
+      .tab-icon {
+        font-size: 24px;
+        font-style: normal;
+      }
 
-        /* ================= 各类弹窗样式 ================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .modal-box { background: #fff; width: 85%; max-width: 320px; border-radius: 12px; padding: 25px 20px; position: relative;}
-        .modal-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; }
-        .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: bold; color: #999; }
-        .modal-tab.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); }
-        .auth-form-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        select.auth-form-input { appearance: none; }
-        .btn-submit { width: 100%; background: #dcb689; color: #fff; border: none; padding: 12px; border-radius: 25px; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
-        .btn-close-modal { position: absolute; top: 10px; right: 15px; font-size: 20px; color: #999; cursor: pointer; }
+      /* ================= 商品详情页 ================= */
+      .detail-header {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 101;
+        background: rgba(0, 0, 0, 0.4);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+      }
+      .detail-img-box {
+        width: 100%;
+        height: 350px;
+        background: #fff;
+      }
+      .detail-img-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .detail-info {
+        background: #fff;
+        padding: 15px;
+        margin-bottom: 10px;
+      }
+      .detail-price-row {
+        color: var(--primary-color);
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .detail-title {
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1.5;
+        margin-bottom: 10px;
+      }
+      .detail-desc {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.6;
+        padding: 15px;
+        background: #fff;
+        margin-bottom: 60px;
+      }
+      .detail-bottom-bar {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        background: #fff;
+        border-top: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        z-index: 101;
+        max-width: 480px;
+      }
+      .action-btns {
+        flex: 1;
+        display: flex;
+        margin-left: 10px;
+        gap: 10px;
+      }
+      .btn-cart {
+        flex: 1;
+        background: #333;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        height: 40px;
+      }
+      .btn-buy {
+        flex: 1;
+        background: #dcb689;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        height: 40px;
+      }
 
-        /* ================= 管理员后台界面 (基础样式) ================= */
-        #admin-dashboard { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f0f2f5; z-index: 2000; display: none; flex-direction: row; }
-        .admin-sidebar { width: 220px; background: #001529; color: #fff; display: flex; flex-direction: column; }
-        .admin-logo { padding: 20px; font-size: 20px; font-weight: bold; text-align: center; border-bottom: 1px solid #1a293b; letter-spacing: 2px;}
-        .admin-menu { flex: 1; padding-top: 20px; }
-        .admin-menu-item { padding: 15px 25px; cursor: pointer; transition: 0.3s; color: #a6adb4; }
-        .admin-menu-item:hover, .admin-menu-item.active { background: #1890ff; color: #fff; }
-        .admin-logout-desktop { padding: 15px; text-align: center; background: #ff4d4f; cursor: pointer; }
-        .admin-logout-mobile { display: none; } 
-        .admin-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .admin-panel { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: none; min-height: 80vh;}
-        .admin-panel.active { display: block; }
-        .admin-panel h2 { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .admin-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #fff; margin-right: 5px;}
-        .btn-blue { background: #1890ff; } .btn-green { background: #52c41a; } .btn-orange { background: #fa8c16; } .btn-red { background: #ff4d4f; }
-        .admin-form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: center;}
-        .admin-form-row input, .admin-form-row textarea { flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 650px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background: #fafafa; font-weight: bold; }
+      /* ================= 结算页 (Checkout) ================= */
+      .checkout-header {
+        text-align: center;
+        padding: 15px;
+        font-size: 18px;
+        font-weight: bold;
+        background: #fff;
+        border-bottom: 1px solid #eee;
+        position: sticky;
+        top: 0;
+      }
+      .checkout-section {
+        background: #fff;
+        margin-bottom: 10px;
+        padding: 15px;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .payment-method {
+        display: flex;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
+      .payment-method input {
+        margin-right: 10px;
+        transform: scale(1.2);
+      }
+      .pay-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        max-width: 480px;
+        background: #fff;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #eee;
+      }
+      .pay-btn {
+        background: var(--primary-color);
+        color: #fff;
+        padding: 10px 30px;
+        border-radius: 20px;
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
+      }
 
-        /* ================= 后台移动端适配核心代码 ================= */
-        @media (max-width: 768px) {
-            #admin-dashboard { flex-direction: column; } 
-            .admin-sidebar { width: 100%; height: auto; flex-direction: column; }
-            .admin-logo { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; text-align: left; font-size: 18px; letter-spacing: 1px; }
-            .admin-logout-desktop { display: none; } 
-            .admin-logout-mobile { display: block; background: #ff4d4f; color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; letter-spacing: 0; }
-            .admin-menu { display: flex; flex-direction: row; padding: 0; overflow-x: auto; white-space: nowrap; border-bottom: 1px solid #ddd; }
-            .admin-menu-item { padding: 12px 20px; flex: 1; text-align: center; }
-            .admin-content { padding: 10px; width: 100%; box-sizing: border-box; }
-            .admin-panel { padding: 15px; min-height: calc(100vh - 120px); }
-            .admin-panel h2 { font-size: 18px; margin-bottom: 15px; }
-            .admin-form-row { flex-direction: column; gap: 10px; align-items: stretch; margin-bottom: 10px; }
-            .admin-form-row input, .admin-form-row textarea { width: 100%; box-sizing: border-box; }
-            .admin-form-row button { margin-top: 5px; height: 44px !important; width: 100%; font-size: 14px; }
-        }
+      /* ================= 订单列表弹层 ================= */
+      .order-list-item {
+        background: #fff;
+        margin: 10px;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .order-status {
+        float: right;
+        color: var(--primary-color);
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      /* ================= 各类弹窗样式 ================= */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(2px);
+      }
+      .modal-box {
+        background: #fff;
+        width: 85%;
+        max-width: 320px;
+        border-radius: 12px;
+        padding: 25px 20px;
+        position: relative;
+      }
+      .modal-tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+      .modal-tab {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #999;
+      }
+      .modal-tab.active {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+      }
+      .auth-form-input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+      select.auth-form-input {
+        appearance: none;
+      }
+      .btn-submit {
+        width: 100%;
+        background: #dcb689;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .btn-close-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        color: #999;
+        cursor: pointer;
+      }
+
+      /* ========================================================== */
+      /* === 管理员后台界面 (彻底抛弃PC布局，统一强制按移动端APP显示) === */
+      /* ========================================================== */
+      #admin-dashboard {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 480px;
+        height: 100vh;
+        background: #f0f2f5;
+        z-index: 2000;
+        display: none;
+        flex-direction: column;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        background: #001529;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+      }
+      .admin-logo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        text-align: left;
+        font-size: 18px;
+        font-weight: bold;
+        border-bottom: 1px solid #1a293b;
+        letter-spacing: 1px;
+      }
+      .admin-menu {
+        display: flex;
+        flex-direction: row;
+        padding: 0;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-bottom: 1px solid #ddd;
+      }
+      .admin-menu-item {
+        padding: 12px 20px;
+        flex: 1;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.3s;
+        color: #a6adb4;
+      }
+      .admin-menu-item:hover,
+      .admin-menu-item.active {
+        background: #1890ff;
+        color: #fff;
+      }
+      .admin-logout-desktop {
+        display: none;
+      }
+      .admin-logout-mobile {
+        display: block;
+        background: #ff4d4f;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        letter-spacing: 0;
+      }
+
+      .admin-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .admin-panel {
+        background: #fff;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        display: none;
+        min-height: calc(100vh - 120px);
+      }
+      .admin-panel.active {
+        display: block;
+      }
+      .admin-panel h2 {
+        font-size: 18px;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .admin-btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        color: #fff;
+        margin-right: 5px;
+      }
+      .btn-blue {
+        background: #1890ff;
+      }
+      .btn-green {
+        background: #52c41a;
+      }
+      .btn-orange {
+        background: #fa8c16;
+      }
+      .btn-red {
+        background: #ff4d4f;
+      }
+
+      .admin-form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+        margin-bottom: 10px;
+      }
+      .admin-form-row input,
+      .admin-form-row textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .admin-form-row button {
+        margin-top: 5px;
+        height: 44px !important;
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 15px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        min-width: 650px;
+      }
+      th,
+      td {
+        border: 1px solid #eee;
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background: #fafafa;
+        font-weight: bold;
+      }
     </style>
-</head>
-<body>
-
-<!-- ================= 前台 APP 容器 ================= -->
-<div id="app">
-    <!-- ================= 1. 文商首页 ================= -->
-    <div id="page-home" class="page-container active">
+  </head>
+  <body>
+    <!-- ================= 前台 APP 容器 ================= -->
+    <div id="app">
+      <!-- ================= 1. 文商首页 ================= -->
+      <div id="page-home" class="page-container active">
         <div class="header">
-            <div class="logo">非遗</div>
-            <div class="search-bar"><span>🔍</span><input type="text" placeholder="文商精选"></div>
+          <div class="logo">艺数视界</div>
+          <div class="search-bar">
+            <span>🔍</span><input type="text" placeholder="礼物精选" />
+          </div>
         </div>
-        
-        <!-- 【修改点】：首页轮播图恢复并增加 onerror 容错防破图 -->
+
         <div class="carousel-container">
-            <div class="carousel-inner" id="home-carousel-inner">
-                <img src="https://images.unsplash.com/photo-1552337399-3bb1d9f40739?w=800&q=80" alt="Banner 1" onerror="this.src='https://via.placeholder.com/800x400/c43c33/fff?text=非遗精选1'">
-                <img src="https://images.unsplash.com/photo-1580136608260-4ebf152d1bc6?w=800&q=80" alt="Banner 2" onerror="this.src='https://via.placeholder.com/800x400/dcb689/fff?text=非遗精选2'">
-                <img src="https://images.unsplash.com/photo-1615672412854-c98b64a22b07?w=800&q=80" alt="Banner 3" onerror="this.src='https://via.placeholder.com/800x400/5a8c8c/fff?text=非遗精选3'">
-                <img src="https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80" alt="Banner 4" onerror="this.src='https://via.placeholder.com/800x400/5a8c6b/fff?text=非遗精选4'">
-            </div>
+          <div class="carousel-inner" id="home-carousel-inner">
+            <img
+              src="img/1.png"
+              alt="Banner 1"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x400/c43c33/fff?text=非遗精选1'
+              "
+            />
+            <img
+              src="img/2.png"
+              alt="Banner 2"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x400/dcb689/fff?text=非遗精选2'
+              "
+            />
+            <img
+              src="img/3.png"
+              alt="Banner 3"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x400/5a8c8c/fff?text=非遗精选3'
+              "
+            />
+            <img
+              src="img/3.png"
+              alt="Banner 4"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x400/5a8c6b/fff?text=非遗精选4'
+              "
+            />
+          </div>
         </div>
-        
+
         <div class="text-nav">
-            <div class="text-item active">全部分类</div><div class="text-item">珍贵木制</div><div class="text-item">漆器工艺</div><div class="text-item">紫砂陶瓷</div><div class="text-item">雕刻艺术</div>
+          <div class="text-item active">全部分类</div>
+          <div class="text-item">珍贵木制</div>
+          <div class="text-item">漆器工艺</div>
+          <div class="text-item">紫砂陶瓷</div>
+          <div class="text-item">雕刻艺术</div>
         </div>
         <div class="icon-nav">
-            <div class="icon-item"><img src="https://images.unsplash.com/photo-1542104523-2895fc30689b?w=200&q=80" alt="" onerror="this.src='https://via.placeholder.com/200/eee?text=图'"><span>联盟商家</span></div>
-            <div class="icon-item"><img src="https://images.unsplash.com/photo-1599839619722-39751411ea63?w=200&q=80" alt="" onerror="this.src='https://via.placeholder.com/200/eee?text=图'"><span>生态伙伴</span></div>
-            <div class="icon-item"><img src="https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=200&q=80" alt="" onerror="this.src='https://via.placeholder.com/200/eee?text=图'"><span>积分商城</span></div>
-            <div class="icon-item"><img src="https://images.unsplash.com/photo-1553150259-22a7f05b8281?w=200&q=80" alt="" onerror="this.src='https://via.placeholder.com/200/eee?text=图'"><span>大师手作</span></div>
-            <div class="icon-item"><img src="https://images.unsplash.com/photo-1508610048659-a06b669e3321?w=200&q=80" alt="" onerror="this.src='https://via.placeholder.com/200/eee?text=图'"><span>私人定制</span></div>
+          <div class="icon-item">
+            <img
+              src="img/4.png"
+              alt=""
+              onerror="this.src = 'https://via.placeholder.com/200/eee?text=图'"
+            /><span>联盟商家</span>
+          </div>
+          <div class="icon-item">
+            <img
+              src="img/5.png"
+              alt=""
+              onerror="this.src = 'https://via.placeholder.com/200/eee?text=图'"
+            /><span>生态伙伴</span>
+          </div>
+          <div class="icon-item">
+            <img
+              src="img/6.png"
+              alt=""
+              onerror="this.src = 'https://via.placeholder.com/200/eee?text=图'"
+            /><span>积分商城</span>
+          </div>
+          <div class="icon-item">
+            <img
+              src="img/7.png"
+              alt=""
+              onerror="this.src = 'https://via.placeholder.com/200/eee?text=图'"
+            /><span>大师手作</span>
+          </div>
+          <div class="icon-item">
+            <img
+              src="img/8.png"
+              alt=""
+              onerror="this.src = 'https://via.placeholder.com/200/eee?text=图'"
+            /><span>私人定制</span>
+          </div>
         </div>
-        <div class="notice-bar"><span class="notice-icon">📢</span>平台活动可以获得大量积分奖励，积分可兑换商品...</div>
+        <div class="notice-bar">
+          <span class="notice-icon">📢</span
+          >平台活动可以获得大量积分奖励，积分可兑换商品...
+        </div>
         <div class="promo-blocks">
-            <div class="promo-card promo-1"><h3>非遗传承</h3><span>非遗精品 点击购买 ▶</span></div>
-            <div class="promo-card promo-2"><h3>工艺美术</h3><span>美术精品 点击购买 ▶</span></div>
+          <div class="promo-card promo-1">
+            <h3>非遗传承</h3>
+            <span>非遗精品 点击购买 ▶</span>
+          </div>
+          <div class="promo-card promo-2">
+            <h3>工艺美术</h3>
+            <span>美术精品 点击购买 ▶</span>
+          </div>
         </div>
 
-        <div style="text-align: center; padding: 15px 0; color: #999; font-size: 14px;">—— 商品推荐 ——</div>
+        <div
+          style="
+            text-align: center;
+            padding: 15px 0;
+            color: #999;
+            font-size: 14px;
+          "
+        >
+          —— 商品推荐 ——
+        </div>
         <!-- 动态渲染的商品列表 -->
         <div class="product-grid" id="home-product-list"></div>
-    </div>
+      </div>
 
-    <!-- ================= 2. 大师名家 (全新重构) ================= -->
-    <div id="page-masters" class="page-container">
-        <div class="header"><div class="search-bar" style="background: #f0f0f0;"><span>🔍</span><input type="text" placeholder="搜索商品/大师"></div></div>
-        
-        <!-- 【修改点】：大师页面新增独立轮播图 -->
-        <div class="carousel-container" style="height: 220px;">
-            <div class="carousel-inner" id="masters-carousel-inner">
-                <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800&q=80" alt="Master 1" onerror="this.src='https://via.placeholder.com/800x440/333/fff?text=大师轮播1'">
-                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80" alt="Master 2" onerror="this.src='https://via.placeholder.com/800x440/555/fff?text=大师轮播2'">
-                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80" alt="Master 3" onerror="this.src='https://via.placeholder.com/800x440/777/fff?text=大师轮播3'">
-                <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bfa82?w=800&q=80" alt="Master 4" onerror="this.src='https://via.placeholder.com/800x440/999/fff?text=大师轮播4'">
-            </div>
+      <!-- ================= 2. 大师名家 (全新重构) ================= -->
+      <div id="page-masters" class="page-container">
+        <div class="header">
+          <div class="search-bar" style="background: #f0f0f0">
+            <span>🔍</span><input type="text" placeholder="搜索商品/大师" />
+          </div>
         </div>
 
-        <!-- 【修改点】：申请入驻图片 -->
-        <div style="width:100%; background:#f9f9f9; padding:15px 0; text-align:center;">
-            <img class="apply-banner" src="https://via.placeholder.com/800x120/f0e6d2/8b5a2b?text=大师入驻申请+++立即申请" alt="大师入驻" style="max-height: 60px; object-fit: contain;">
+        <div class="carousel-container" style="height: 220px">
+          <div class="carousel-inner" id="masters-carousel-inner">
+            <img
+              src="img/刘立忠.jpg"
+              alt="Master 1"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x440/333/fff?text=大师轮播1'
+              "
+            />
+            <img
+              src="img/安际衡.jpg"
+              alt="Master 2"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x440/555/fff?text=大师轮播2'
+              "
+            />
+            <img
+              src="img/高英坡.jpg"
+              alt="Master 3"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x440/777/fff?text=大师轮播3'
+              "
+            />
+            <img
+              src="img/张同禄.jpg"
+              alt="Master 4"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/800x440/999/fff?text=大师轮播4'
+              "
+            />
+          </div>
         </div>
 
-        <!-- 【修改点】：专栏 1 - 非遗传承 -->
+        <!-- 专栏 1 - 非遗传承 -->
         <div class="section-title">
-            <div style="display:flex; flex-direction:column;">
-                <span style="font-size:16px;">非遗传承</span>
-                <span style="font-size:10px; color:#ccc; font-weight:normal; margin-top:2px;">FEIYICHUANCHENG</span>
-            </div>
-            <span style="font-weight:normal; font-size:12px; color:#999;">查看更多 &gt;</span>
+          <div style="display: flex; flex-direction: column">
+            <span style="font-size: 16px">非遗传承</span>
+            <span
+              style="
+                font-size: 10px;
+                color: #ccc;
+                font-weight: normal;
+                margin-top: 2px;
+              "
+              >FEIYICHUANCHENG</span
+            >
+          </div>
+          <span style="font-weight: normal; font-size: 12px; color: #999"
+            >查看更多 &gt;</span
+          >
         </div>
         <div class="master-scroll">
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">孙艳玲</div>
-                </div>
-                <div class="master-card-title">满绣第四代传承人</div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/安际衡.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">安际衡</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">任志国</div>
-                </div>
-                <div class="master-card-title">蔚县剪纸传承人</div>
+            <div class="master-card-title">国家级非遗磁州窑烧制技艺传承人</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/李泽霞.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">李泽霞</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">刘嘉峰</div>
-                </div>
-                <div class="master-card-title">刘氏竹编创始人</div>
+            <div class="master-card-title">衡水老白干蒸馏酒传统酿造技艺非遗传人</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/牛俊启.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">牛俊启</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">王丽华</div>
-                </div>
-                <div class="master-card-title">苏绣代表性传承人</div>
+            <div class="master-card-title">国家级非遗胜芳灯会传承人</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/石俊凤.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">石俊凤</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">张建国</div>
-                </div>
-                <div class="master-card-title">木雕非遗传承人</div>
-            </div>
+            <div class="master-card-title">国家级非遗丰宁满族剪纸传承人</div>
+          </div>
+          
         </div>
 
-        <!-- 【修改点】：专栏 2 - 工艺美术 -->
+        <!-- 专栏 2 - 工艺美术 -->
         <div class="section-title">
-            <div style="display:flex; flex-direction:column;">
-                <span style="font-size:16px;">工艺美术</span>
-                <span style="font-size:10px; color:#ccc; font-weight:normal; margin-top:2px;">GONGYIMEISHU</span>
-            </div>
-            <span style="font-weight:normal; font-size:12px; color:#999;">查看更多 &gt;</span>
+          <div style="display: flex; flex-direction: column">
+            <span style="font-size: 16px">工艺美术大师</span>
+            <span
+              style="
+                font-size: 10px;
+                color: #ccc;
+                font-weight: normal;
+                margin-top: 2px;
+              "
+              >GONGYIMEISHU</span
+            >
+          </div>
+          <span style="font-weight: normal; font-size: 12px; color: #999"
+            >查看更多 &gt;</span
+          >
         </div>
         <div class="master-scroll">
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1548142813-c348350df52b?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">邬建美</div>
-                </div>
-                <div class="master-card-title">正高级艺术创意设计</div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/刘立忠.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">刘立忠</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">孙亚青</div>
-                </div>
-                <div class="master-card-title">正高级工艺美术师</div>
+            <div class="master-card-title">磁州窑烧制技艺非遗传人</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/庞永辉.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">庞永辉</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">余志贤</div>
-                </div>
-                <div class="master-card-title">琢器拉坯传承人</div>
+            <div class="master-card-title">正高级工艺美术师</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/张同禄.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">张同禄</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">李明</div>
-                </div>
-                <div class="master-card-title">陶瓷工艺美术大师</div>
+            <div class="master-card-title">景泰蓝制作技艺非遗传人</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/王树昌.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">王树昌</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">赵玉</div>
-                </div>
-                <div class="master-card-title">漆器工艺美术师</div>
+            <div class="master-card-title">玉雕工艺大师</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/高英坡.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">高英坡</div>
             </div>
+            <div class="master-card-title">正高级工艺美术师</div>
+          </div>
         </div>
 
-        <!-- 【修改点】：专栏 3 - 名人名家 -->
+        <!-- 专栏 3 - 名人名家 -->
         <div class="section-title">
-            <div style="display:flex; flex-direction:column;">
-                <span style="font-size:16px;">名人名家</span>
-                <span style="font-size:10px; color:#ccc; font-weight:normal; margin-top:2px;">MINGRENMINGJIA</span>
-            </div>
-            <span style="font-weight:normal; font-size:12px; color:#999;">查看更多 &gt;</span>
+          <div style="display: flex; flex-direction: column">
+            <span style="font-size: 16px">名人名家</span>
+            <span
+              style="
+                font-size: 10px;
+                color: #ccc;
+                font-weight: normal;
+                margin-top: 2px;
+              "
+              >MINGRENMINGJIA</span
+            >
+          </div>
+          <span style="font-weight: normal; font-size: 12px; color: #999"
+            >查看更多 &gt;</span
+          >
         </div>
         <div class="master-scroll">
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">蒋香薇</div>
-                </div>
-                <div class="master-card-title">国际古今艺术研究</div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/王习三.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">王习三</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">周殿武</div>
-                </div>
-                <div class="master-card-title">国家一级美术师</div>
+            <div class="master-card-title">冀派内画创始人</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/徐光耀.jpg"
+                onerror="
+                  this.src = 'img/徐光耀.jpg'
+                "
+              />
+              <div class="master-card-name">徐光耀</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1552058544-f2b08422138a?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">邵鸿萍</div>
-                </div>
-                <div class="master-card-title">中国美术家协会会员</div>
+            <div class="master-card-title">经典红色文学作家</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/郭海博.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">郭海博</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">何永麟</div>
-                </div>
-                <div class="master-card-title">书画名家</div>
+            <div class="master-card-title">铁板浮雕技艺大师</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/何申.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">何申</div>
             </div>
-            <div class="master-card-new">
-                <div class="master-card-img-box">
-                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&q=80" onerror="this.src='https://via.placeholder.com/300x400/eee?text=人物'">
-                    <div class="master-card-name">丁全</div>
-                </div>
-                <div class="master-card-title">木雕名家</div>
+            <div class="master-card-title">河北文坛 “三驾马车” 之一</div>
+          </div>
+          <div class="master-card-new">
+            <div class="master-card-img-box">
+              <img
+                src="img/铁凝.jpg"
+                onerror="
+                  this.src = 'https://via.placeholder.com/300x400/eee?text=人物'
+                "
+              />
+              <div class="master-card-name">铁凝</div>
             </div>
+            <div class="master-card-title">当代著名作家</div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- 3. 社群资讯 -->
-    <div id="page-news" class="page-container">
-        <div class="header"><div class="search-bar" style="background: #f0f0f0;"><span>🔍</span><input type="text" placeholder="搜索资讯"></div></div>
+      <!-- 3. 社群资讯 -->
+      <div id="page-news" class="page-container">
+        <div class="header">
+          <div class="search-bar" style="background: #f0f0f0">
+            <span>🔍</span><input type="text" placeholder="搜索资讯" />
+          </div>
+        </div>
         <div class="news-item">
-            <div style="font-weight:bold; font-size:16px;">【北京地志人文探索】沉浸式体验古都风韵</div>
-            <img class="news-img" src="https://images.unsplash.com/photo-1508804052814-cd3ba865a116?w=800&q=80" alt="资讯">
+          <div style="font-weight: bold; font-size: 16px">
+            【非遗传承】保定曲阳石雕作品《反弹琵琶》斩获国家级工艺美术金奖
+          </div>
+          <img
+            class="news-img"
+            src="img/e.jpg"
+            alt="资讯"
+          />
         </div>
-    </div>
+        <div class="news-item">
+          <div style="font-weight: bold; font-size: 16px">
+            【雄安非遗保护】白洋淀芦苇画技艺纳入省级非遗代表性项目名录
+          </div>
+          <img
+            class="news-img"
+            src="img/f.jpg"
+            alt="资讯"
+          />
+        </div>
+      </div>
 
-    <!-- 4. 会员中心 -->
-    <div id="page-member" class="page-container">
+      <!-- 4. 会员中心 -->
+      <div id="page-member" class="page-container">
         <div class="member-header-container">
-            <div class="member-top-nav"><span>会员中心</span></div>
-            <div class="user-card">
-                <!-- 点击登录的触发区域已经扩大，完美兼容 -->
-                <div class="user-info-top" onclick="requireLogin()" style="cursor: pointer;">
-                    <div class="login-text" id="member-username">点击登录</div>
-                    <img class="avatar" id="member-avatar" src="https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80" alt="avatar">
-                </div>
-                <div class="user-stats">
-                    <div class="stat-item"><div class="val">0</div><div class="lbl">积分</div></div>
-                    <div class="stat-item"><div class="val">0.00</div><div class="lbl">余额</div></div>
-                    <div class="stat-item"><div class="val">0</div><div class="lbl">优惠券</div></div>
-                </div>
-                
-                <div class="action-btn-group">
-                    <button class="logout-btn" id="btn-edit-profile" style="display:none;" onclick="openEditProfileModal()">修改资料</button>
-                    <button class="logout-btn" id="btn-admin-login" style="display:none;" onclick="openAdminVerifyModal()">登录后台</button>
-                    <button class="logout-btn" id="btn-logout" style="display:none;" onclick="logout()">退出登录</button>
-                </div>
+          <div class="member-top-nav"><span>会员中心</span></div>
+          <div class="user-card">
+            <!-- 依然保留了扩大的点击区域和指针，并且保证在PC端也能触发 -->
+            <div
+              class="user-info-top"
+              onclick="requireLogin()"
+              style="cursor: pointer"
+            >
+              <div class="login-text" id="member-username">点击登录</div>
+              <img
+                class="avatar"
+                id="member-avatar"
+                src="https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80"
+                alt="avatar"
+              />
             </div>
+            <div class="user-stats">
+              <div class="stat-item">
+                <div class="val">0</div>
+                <div class="lbl">积分</div>
+              </div>
+              <div class="stat-item">
+                <div class="val">0.00</div>
+                <div class="lbl">余额</div>
+              </div>
+              <div class="stat-item">
+                <div class="val">0</div>
+                <div class="lbl">优惠券</div>
+              </div>
+            </div>
+
+            <div class="action-btn-group">
+              <button
+                class="logout-btn"
+                id="btn-edit-profile"
+                style="display: none"
+                onclick="openEditProfileModal()"
+              >
+                修改资料
+              </button>
+              <button
+                class="logout-btn"
+                id="btn-admin-login"
+                style="display: none"
+                onclick="openAdminVerifyModal()"
+              >
+                登录后台
+              </button>
+              <button
+                class="logout-btn"
+                id="btn-logout"
+                style="display: none"
+                onclick="logout()"
+              >
+                退出登录
+              </button>
+            </div>
+          </div>
         </div>
         <div class="member-section">
-            <div style="font-weight:bold; margin-bottom: 10px;">我的订单</div>
-            <div class="member-icon-grid">
-                <div class="member-icon-item" onclick="showUserOrders('pending_shipment')">
-                    <i>📦</i><span>待发货</span><span class="badge" id="badge-shipment">0</span>
-                </div>
-                <div class="member-icon-item" onclick="showUserOrders('pending_receipt')">
-                    <i>🚚</i><span>待收货</span><span class="badge" id="badge-receipt">0</span>
-                </div>
-                <div class="member-icon-item" onclick="showUserOrders('pending_review')">
-                    <i>💬</i><span>待评价</span><span class="badge" id="badge-review">0</span>
-                </div>
-                <div class="member-icon-item"><i>↩️</i><span>退换货</span></div>
+          <div style="font-weight: bold; margin-bottom: 10px">我的订单</div>
+          <div class="member-icon-grid">
+            <div
+              class="member-icon-item"
+              onclick="showUserOrders('pending_shipment')"
+            >
+              <i>📦</i><span>待发货</span
+              ><span class="badge" id="badge-shipment">0</span>
             </div>
+            <div
+              class="member-icon-item"
+              onclick="showUserOrders('pending_receipt')"
+            >
+              <i>🚚</i><span>待收货</span
+              ><span class="badge" id="badge-receipt">0</span>
+            </div>
+            <div
+              class="member-icon-item"
+              onclick="showUserOrders('pending_review')"
+            >
+              <i>💬</i><span>待评价</span
+              ><span class="badge" id="badge-review">0</span>
+            </div>
+            <div class="member-icon-item"><i>↩️</i><span>退换货</span></div>
+          </div>
         </div>
+      </div>
+
+      <!-- 底部导航 -->
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('home', this)">
+          <i>🏠</i><span>首页</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('masters', this)">
+          <i>🪭</i><span>大师</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('news', this)">
+          <i>💬</i><span>资讯</span>
+        </div>
+        <div class="tab-item" onclick="switchTab('member', this, true)">
+          <i>👤</i><span>我的</span>
+        </div>
+      </div>
     </div>
 
-    <!-- 底部导航 -->
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('home', this)"><i>🏠</i><span>首页</span></div>
-        <div class="tab-item" onclick="switchTab('masters', this)"><i>🪭</i><span>大师</span></div>
-        <div class="tab-item" onclick="switchTab('news', this)"><i>💬</i><span>资讯</span></div>
-        <div class="tab-item" onclick="switchTab('member', this, true)"><i>👤</i><span>我的</span></div>
-    </div>
-</div>
-
-<!-- ================= 各类独立子页 (前台详情/结算等) ================= -->
-<div id="page-detail" class="full-page">
-    <div class="detail-header" onclick="closeFullPage('page-detail')">&lt;</div>
-    <div class="detail-img-box"><img id="detail-img" src="" alt="商品图"></div>
-    <div class="detail-info">
+    <!-- ================= 各类独立子页 (前台详情/结算等) ================= -->
+    <div id="page-detail" class="full-page">
+      <div class="detail-header" onclick="closeFullPage('page-detail')">
+        &lt;
+      </div>
+      <div class="detail-img-box">
+        <img id="detail-img" src="" alt="商品图" />
+      </div>
+      <div class="detail-info">
         <div class="detail-price-row" id="detail-price">¥ 0.00</div>
         <div class="detail-title" id="detail-title">商品名称</div>
+      </div>
+      <div class="detail-desc" id="detail-desc">这里是商品详细介绍...</div>
+      <div class="detail-bottom-bar">
+        <div class="action-btns">
+          <button class="btn-buy" onclick="goToCheckout()" style="flex: 2">
+            立即购买
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="detail-desc" id="detail-desc">这里是商品详细介绍...</div>
-    <div class="detail-bottom-bar">
-        <div class="action-btns"><button class="btn-buy" onclick="goToCheckout()" style="flex:2;">立即购买</button></div>
-    </div>
-</div>
 
-<div id="page-checkout" class="full-page" style="background: #f5f5f5;">
-    <div class="detail-header" onclick="closeFullPage('page-checkout')">&lt;</div>
-    <div class="checkout-header">确认订单</div>
-    <div class="checkout-section">
+    <div id="page-checkout" class="full-page" style="background: #f5f5f5">
+      <div class="detail-header" onclick="closeFullPage('page-checkout')">
+        &lt;
+      </div>
+      <div class="checkout-header">确认订单</div>
+      <div class="checkout-section">
         <h3>收货地址</h3>
-        <p style="font-size:12px; color:#999; margin: 5px 0;">首次购买需填写，将保存至您的账户</p>
-        <div class="form-group"><textarea id="checkout-address" rows="3" placeholder="请输入您的详细收货地址 (省市区街道门牌号)"></textarea></div>
-    </div>
-    <div class="checkout-section">
+        <p style="font-size: 12px; color: #999; margin: 5px 0">
+          首次购买需填写，将保存至您的账户
+        </p>
+        <div class="form-group">
+          <textarea
+            id="checkout-address"
+            rows="3"
+            placeholder="请输入您的详细收货地址 (省市区街道门牌号)"
+          ></textarea>
+        </div>
+      </div>
+      <div class="checkout-section">
         <h3>商品信息</h3>
-        <div style="display:flex; margin-top:10px;">
-            <img id="checkout-img" src="" style="width:60px; height:60px; object-fit:cover; border-radius:4px; margin-right:10px;">
-            <div><div id="checkout-title" style="font-size:14px; margin-bottom:5px;">名称</div><div id="checkout-price" style="color:var(--primary-color); font-weight:bold;">¥0.00</div></div>
+        <div style="display: flex; margin-top: 10px">
+          <img
+            id="checkout-img"
+            src=""
+            style="
+              width: 60px;
+              height: 60px;
+              object-fit: cover;
+              border-radius: 4px;
+              margin-right: 10px;
+            "
+          />
+          <div>
+            <div
+              id="checkout-title"
+              style="font-size: 14px; margin-bottom: 5px"
+            >
+              名称
+            </div>
+            <div
+              id="checkout-price"
+              style="color: var(--primary-color); font-weight: bold"
+            >
+              ¥0.00
+            </div>
+          </div>
         </div>
-    </div>
-    <div class="checkout-section">
+      </div>
+      <div class="checkout-section">
         <h3>支付方式</h3>
-        <label class="payment-method"><input type="radio" name="pay-method" value="WeChat" checked> 🟢 微信支付</label>
-        <label class="payment-method"><input type="radio" name="pay-method" value="Alipay"> 🔵 支付宝</label>
-    </div>
-    <div class="pay-footer">
-        <div>合计: <span id="checkout-total" style="color:var(--primary-color); font-size:20px; font-weight:bold;">¥0.00</span></div>
+        <label class="payment-method"
+          ><input type="radio" name="pay-method" value="WeChat" checked /> 🟢
+          微信支付</label
+        >
+        <label class="payment-method"
+          ><input type="radio" name="pay-method" value="Alipay" /> 🔵
+          支付宝</label
+        >
+      </div>
+      <div class="pay-footer">
+        <div>
+          合计:
+          <span
+            id="checkout-total"
+            style="
+              color: var(--primary-color);
+              font-size: 20px;
+              font-weight: bold;
+            "
+            >¥0.00</span
+          >
+        </div>
         <button class="pay-btn" onclick="submitOrder()">立即支付</button>
+      </div>
     </div>
-</div>
 
-<div id="page-my-orders" class="full-page" style="background: #f5f5f5;">
-    <div class="detail-header" onclick="closeFullPage('page-my-orders')">&lt;</div>
-    <div class="checkout-header" id="my-orders-title">订单列表</div>
-    <div id="my-orders-list" style="padding-bottom: 20px;"></div>
-</div>
+    <div id="page-my-orders" class="full-page" style="background: #f5f5f5">
+      <div class="detail-header" onclick="closeFullPage('page-my-orders')">
+        &lt;
+      </div>
+      <div class="checkout-header" id="my-orders-title">订单列表</div>
+      <div id="my-orders-list" style="padding-bottom: 20px"></div>
+    </div>
 
-<!-- ================= 弹窗：普通登录/注册 ================= -->
-<div id="login-modal" class="modal-overlay">
-    <div class="modal-box">
-        <span class="btn-close-modal" onclick="closeModal('login-modal')">×</span>
+    <!-- ================= 弹窗：普通登录/注册 ================= -->
+    <div id="login-modal" class="modal-overlay">
+      <div class="modal-box">
+        <span class="btn-close-modal" onclick="closeModal('login-modal')"
+          >×</span
+        >
         <div class="modal-tabs">
-            <div class="modal-tab active" id="tab-login" onclick="toggleAuth('login')">登录</div>
-            <div class="modal-tab" id="tab-register" onclick="toggleAuth('register')">注册</div>
+          <div
+            class="modal-tab active"
+            id="tab-login"
+            onclick="toggleAuth('login')"
+          >
+            登录
+          </div>
+          <div
+            class="modal-tab"
+            id="tab-register"
+            onclick="toggleAuth('register')"
+          >
+            注册
+          </div>
         </div>
-        
+
         <div id="form-login">
-            <select id="login-role" class="auth-form-input">
-                <option value="user">普通用户</option>
-                <option value="admin">管理员 (后台)</option>
-            </select>
-            <input type="text" id="login-account" class="auth-form-input" placeholder="请输入账号 (管理员默认 root)">
-            <input type="password" id="login-password" class="auth-form-input" placeholder="请输入密码 (管理员默认 123456)">
-            <button class="btn-submit" onclick="doLogin()">立即登录</button>
+          <select id="login-role" class="auth-form-input">
+            <option value="user">普通用户</option>
+            <option value="admin">管理员 (后台)</option>
+          </select>
+          <input
+            type="text"
+            id="login-account"
+            class="auth-form-input"
+            placeholder="请输入账号"
+          />
+          <input
+            type="password"
+            id="login-password"
+            class="auth-form-input"
+            placeholder="请输入密码"
+          />
+          <button class="btn-submit" onclick="doLogin()">立即登录</button>
         </div>
 
-        <div id="form-register" style="display:none;">
-            <input type="text" id="reg-account" class="auth-form-input" placeholder="设置账号 (即登录名)">
-            <input type="password" id="reg-password" class="auth-form-input" placeholder="设置密码">
-            <button class="btn-submit" onclick="doRegister()">立即注册</button>
+        <div id="form-register" style="display: none">
+          <input
+            type="text"
+            id="reg-account"
+            class="auth-form-input"
+            placeholder="设置账号 (即登录名)"
+          />
+          <input
+            type="password"
+            id="reg-password"
+            class="auth-form-input"
+            placeholder="设置密码"
+          />
+          <button class="btn-submit" onclick="doRegister()">立即注册</button>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- ================= 弹窗：前台修改个人资料 ================= -->
-<div id="edit-profile-modal" class="modal-overlay">
-    <div class="modal-box">
-        <span class="btn-close-modal" onclick="closeModal('edit-profile-modal')">×</span>
-        <h3 style="margin-bottom: 15px; text-align: center;">修改个人资料</h3>
-        
-        <div style="margin-bottom: 15px;">
-            <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">昵称 (如果不填默认显示账号)</label>
-            <input type="text" id="edit-profile-nickname" class="auth-form-input" placeholder="请输入新昵称">
+    <!-- ================= 弹窗：前台修改个人资料 ================= -->
+    <div id="edit-profile-modal" class="modal-overlay">
+      <div class="modal-box">
+        <span class="btn-close-modal" onclick="closeModal('edit-profile-modal')"
+          >×</span
+        >
+        <h3 style="margin-bottom: 15px; text-align: center">修改个人资料</h3>
+
+        <div style="margin-bottom: 15px">
+          <label
+            style="
+              font-size: 12px;
+              color: #666;
+              display: block;
+              margin-bottom: 5px;
+            "
+            >昵称 (如果不填默认显示账号)</label
+          >
+          <input
+            type="text"
+            id="edit-profile-nickname"
+            class="auth-form-input"
+            placeholder="请输入新昵称"
+          />
         </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label style="font-size:12px; color:#666; display:block; margin-bottom:5px;">上传新头像</label>
-            <input type="file" id="edit-profile-avatar-file" accept="image/*" class="auth-form-input" style="padding: 9px;">
+
+        <div style="margin-bottom: 15px">
+          <label
+            style="
+              font-size: 12px;
+              color: #666;
+              display: block;
+              margin-bottom: 5px;
+            "
+            >上传新头像</label
+          >
+          <input
+            type="file"
+            id="edit-profile-avatar-file"
+            accept="image/*"
+            class="auth-form-input"
+            style="padding: 9px"
+          />
         </div>
-        
+
         <button class="btn-submit" onclick="saveUserProfile()">保存修改</button>
+      </div>
     </div>
-</div>
 
-<!-- ================= 弹窗：普通用户一键快捷验证管理员 ================= -->
-<div id="admin-verify-modal" class="modal-overlay">
-    <div class="modal-box">
-        <span class="btn-close-modal" onclick="closeModal('admin-verify-modal')">×</span>
-        <h3 style="margin-bottom: 15px; text-align: center; color: var(--primary-color);">管理员登录</h3>
-        <p style="font-size:12px; color:#999; margin-bottom:15px; text-align:center;">验证身份直接进入后台，不影响当前用户状态</p>
-        <input type="text" id="admin-verify-account" class="auth-form-input" placeholder="管理员账号 (默认 root)">
-        <input type="password" id="admin-verify-password" class="auth-form-input" placeholder="密码 (默认 123456)">
-        <button class="btn-submit" onclick="verifyAdminAndEnter()">进入后台</button>
+    <!-- ================= 弹窗：普通用户一键快捷验证管理员 ================= -->
+    <div id="admin-verify-modal" class="modal-overlay">
+      <div class="modal-box">
+        <span class="btn-close-modal" onclick="closeModal('admin-verify-modal')"
+          >×</span
+        >
+        <h3
+          style="
+            margin-bottom: 15px;
+            text-align: center;
+            color: var(--primary-color);
+          "
+        >
+          管理员登录
+        </h3>
+        <p
+          style="
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 15px;
+            text-align: center;
+          "
+        >
+          验证身份直接进入后台，不影响当前用户状态
+        </p>
+        <input
+          type="text"
+          id="admin-verify-account"
+          class="auth-form-input"
+          placeholder="管理员账号"
+        />
+        <input
+          type="password"
+          id="admin-verify-password"
+          class="auth-form-input"
+          placeholder="密码"
+        />
+        <button class="btn-submit" onclick="verifyAdminAndEnter()">
+          进入后台
+        </button>
+      </div>
     </div>
-</div>
 
-<!-- ================= 纯PC端：管理员后台系统 (已适配移动端) ================= -->
-<div id="admin-dashboard">
-    <div class="admin-sidebar">
+    <!-- ================= 管理员后台系统 (彻底强制使用移动端APP样式) ================= -->
+    <div id="admin-dashboard">
+      <div class="admin-sidebar">
         <div class="admin-logo">
-            后台管理
-            <span class="admin-logout-mobile" onclick="logoutAdmin()">退出</span>
+          后台管理
+          <span class="admin-logout-mobile" onclick="logoutAdmin()">退出</span>
         </div>
         <div class="admin-menu">
-            <div class="admin-menu-item active" onclick="switchAdminTab('products', this)">📦 商品管理</div>
-            <div class="admin-menu-item" onclick="switchAdminTab('orders', this)">📝 订单管理</div>
-            <div class="admin-menu-item" onclick="switchAdminTab('users', this)">👥 用户管理</div>
+          <div
+            class="admin-menu-item active"
+            onclick="switchAdminTab('products', this)"
+          >
+            📦 商品管理
+          </div>
+          <div class="admin-menu-item" onclick="switchAdminTab('orders', this)">
+            📝 订单管理
+          </div>
+          <div class="admin-menu-item" onclick="switchAdminTab('users', this)">
+            👥 用户管理
+          </div>
         </div>
-        <div class="admin-logout-desktop" onclick="logoutAdmin()">退出后台系统</div>
-    </div>
-    
-    <div class="admin-content">
+      </div>
+
+      <div class="admin-content">
         <!-- 1. 商品管理 -->
         <div id="admin-products" class="admin-panel active">
-            <h2>商品管理</h2>
-            <div style="background:#f9f9f9; padding:15px; border-radius:8px; margin-bottom:15px;">
-                <h3 id="admin-prod-form-title" style="margin-bottom:10px; font-size:14px;">添加新商品</h3>
-                <div class="admin-form-row">
-                    <input type="text" id="add-prod-name" placeholder="商品名称">
-                    <input type="number" id="add-prod-price" placeholder="价格 (元)">
-                </div>
-                <div class="admin-form-row" style="flex-direction: row;">
-                    <input type="file" id="add-prod-img-file" accept="image/*" style="padding: 5px; background: #fff;" onchange="previewProductImage(this)">
-                    <img id="add-prod-img-preview" src="" style="width:40px; height:40px; object-fit:cover; border-radius:4px; display:none; border:1px solid #ddd;">
-                </div>
-                <div class="admin-form-row">
-                    <textarea id="add-prod-desc" rows="2" placeholder="商品介绍文字..."></textarea>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <button id="btn-save-prod" class="admin-btn btn-blue" style="height:40px; flex:1;" onclick="adminSaveProduct()">+ 添加商品</button>
-                    <button id="btn-cancel-prod" class="admin-btn btn-orange" style="height:40px; flex:1; display:none;" onclick="cancelEditProduct()">取消修改</button>
-                </div>
+          <h2>商品管理</h2>
+          <div
+            style="
+              background: #f9f9f9;
+              padding: 15px;
+              border-radius: 8px;
+              margin-bottom: 15px;
+            "
+          >
+            <h3
+              id="admin-prod-form-title"
+              style="margin-bottom: 10px; font-size: 14px"
+            >
+              添加新商品
+            </h3>
+            <div class="admin-form-row">
+              <input type="text" id="add-prod-name" placeholder="商品名称" />
+              <input
+                type="number"
+                id="add-prod-price"
+                placeholder="价格 (元)"
+              />
             </div>
-            <div class="table-responsive">
-                <table id="admin-product-table">
-                    <thead><tr><th>ID</th><th>图片</th><th>名称</th><th>价格</th><th>操作</th></tr></thead>
-                    <tbody></tbody>
-                </table>
+            <div class="admin-form-row" style="flex-direction: row">
+              <input
+                type="file"
+                id="add-prod-img-file"
+                accept="image/*"
+                style="padding: 5px; background: #fff"
+                onchange="previewProductImage(this)"
+              />
+              <img
+                id="add-prod-img-preview"
+                src=""
+                style="
+                  width: 40px;
+                  height: 40px;
+                  object-fit: cover;
+                  border-radius: 4px;
+                  display: none;
+                  border: 1px solid #ddd;
+                "
+              />
             </div>
+            <div class="admin-form-row">
+              <textarea
+                id="add-prod-desc"
+                rows="2"
+                placeholder="商品介绍文字..."
+              ></textarea>
+            </div>
+            <div style="display: flex; gap: 10px">
+              <button
+                id="btn-save-prod"
+                class="admin-btn btn-blue"
+                style="height: 44px; flex: 1"
+                onclick="adminSaveProduct()"
+              >
+                + 添加商品
+              </button>
+              <button
+                id="btn-cancel-prod"
+                class="admin-btn btn-orange"
+                style="height: 44px; flex: 1; display: none"
+                onclick="cancelEditProduct()"
+              >
+                取消修改
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="admin-product-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>图片</th>
+                  <th>名称</th>
+                  <th>价格</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
 
         <!-- 2. 订单管理 -->
         <div id="admin-orders" class="admin-panel">
-            <h2>商品订单管理</h2>
-            <div class="table-responsive">
-                <table id="admin-order-table">
-                    <thead><tr><th>订单号</th><th>购买用户</th><th>商品名称</th><th>收货地址</th><th>状态</th><th>操作</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+          <h2>商品订单管理</h2>
+          <div class="table-responsive">
+            <table id="admin-order-table">
+              <thead>
+                <tr>
+                  <th>订单号</th>
+                  <th>购买用户</th>
+                  <th>商品名称</th>
+                  <th>收货地址</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
 
         <!-- 3. 用户信息管理 -->
         <div id="admin-users" class="admin-panel">
-            <h2>用户信息管理</h2>
-            <p style="font-size:12px; color:#666; margin-bottom:10px;">💡 提示：点击用户头像图片可直接为其上传替换新头像。</p>
-            <div class="table-responsive">
-                <table id="admin-user-table">
-                    <thead><tr><th>角色</th><th>账号/昵称</th><th>密码</th><th>头像 (点击修改)</th><th>收货地址</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+          <h2>用户信息管理</h2>
+          <p style="font-size: 12px; color: #666; margin-bottom: 10px">
+            💡 提示：点击用户头像图片可直接为其上传替换新头像。
+          </p>
+          <div class="table-responsive">
+            <table id="admin-user-table">
+              <thead>
+                <tr>
+                  <th>角色</th>
+                  <th>账号/昵称</th>
+                  <th>密码</th>
+                  <th>头像 (点击修改)</th>
+                  <th>收货地址</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
+    <script>
+      // ================= 核心数据与初始化 =================
+      
+      // 1. 固定的四个底层商品（在后台不可修改/删除，永远展示）
+      const fixedProducts =[
+        {
+          id: 'fixed_1',
+          name: "保定曲阳汉白玉石雕・反弹琵琶飞天摆件",
+          price: "1280",
+          img: "img/a.jpg",
+          desc: "国家级非物质文化遗产「曲阳石雕」代表性作品，选用天然汉白玉整料手工雕刻而成。作品以敦煌飞天为灵感，人物衣袂飘逸、线条灵动，琵琶细节、云纹底座栩栩如生，将传统雕刻技艺与东方美学完美融合，兼具收藏价值与艺术观赏性，是彰显河北非遗文化的高端礼赠佳品。",
+          isFixed: true
+        },
+        {
+          id: 'fixed_2',
+          name: "保定易县易水砚・长城纹圆形砚台",
+          price: "599",
+          img: "img/b.jpg",
+          desc: "国家级非物质文化遗产「易水砚制作技艺」出品，采用易县特产紫翠石手工雕刻而成。砚台以长城为设计元素，纹理古朴大气，石质细腻坚密、发墨如油、不损笔毫，是文房四宝中的经典名砚。既适合书法爱好者日常使用，也可作为非遗文化礼品，承载保定易县千年制砚文化。",
+          isFixed: true
+        },
+        {
+          id: 'fixed_3',
+          name: "保定定州定窑白釉刻花缠枝纹斗笠碗",
+          price: "899",
+          img: "img/c.jpg",
+          desc: "国家级非物质文化遗产「定窑烧制技艺」复刻作品，还原宋代五大名窑定窑的经典工艺。碗身采用白釉刻花工艺，缠枝花卉纹样灵动流畅，釉色温润如玉，口沿包金提升质感，兼具日用与收藏价值。作为保定曲阳的非遗名片，是展现河北宋瓷文化的高端文创礼器。",
+          isFixed: true
+        },
+        {
+          id: 'fixed_4',
+          name: "雄安白洋淀芦苇画・荷塘鸳鸯装饰画",
+          price: "389",
+          img: "img/d.jpg",
+          desc: "河北省级非物质文化遗产「白洋淀芦苇画」代表性作品，采用白洋淀天然芦苇，经选料、烫色、裁切、粘贴等多道手工工序制作而成。作品以雄安白洋淀荷塘、鸳鸯为主题，画面质感温润、层次分明，完美还原水乡生态风貌，是极具雄安地域特色的非遗文创，适合家居装饰与礼赠。",
+          isFixed: true
+        }
+      ];
 
-<script>
-    // ================= 核心数据与初始化 (模拟数据库) =================
-    const defaultData = {
+      const defaultData = {
         users:[
-            { id: 'admin_1', role: 'admin', account: 'root', password: '123456', nickname: '超级管理员', address: '', avatar: '' }
+          {
+            id: "admin_1",
+            role: "admin",
+            account: "root",
+            password: "123456",
+            nickname: "超级管理员",
+            address: "",
+            avatar: "",
+          },
         ],
-        products:[
-            { id: 1, name: "金箔蝴蝶标本成品美凤蝶标本手工七夕送礼...", price: "182.90", img: "https://images.unsplash.com/photo-1555662800-8d5427ec7f41?w=400&q=80", desc: "精美金箔蝴蝶标本，传统手工制作，适合七夕送礼收藏。" },
-            { id: 2, name: "人参礼盒吉祥如意四宝礼盒过节春节送长辈...", price: "139.00", img: "https://images.unsplash.com/photo-1587049352847-4d4b17f6990b?w=400&q=80", desc: "东北特产长白山人参四宝礼盒，吉祥如意，送长辈佳品。" }
-        ],
-        orders:[]
-    };
+        orders:[],
+      };
 
-    function getData(key) { return JSON.parse(localStorage.getItem(key)) || defaultData[key]; }
-    function setData(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+      // 获取数据：拦截产品请求，把固定产品和后台动态添加的产品合并
+      function getData(key) {
+        if (key === 'products') {
+            const dynamicProducts = JSON.parse(localStorage.getItem('dynamicProducts')) || [];
+            return[...fixedProducts, ...dynamicProducts];
+        }
+        return JSON.parse(localStorage.getItem(key)) || defaultData[key];
+      }
 
-    if(!localStorage.getItem('users')) setData('users', defaultData.users);
-    if(!localStorage.getItem('products')) setData('products', defaultData.products);
-    if(!localStorage.getItem('orders')) setData('orders', defaultData.orders);
+      // 保存数据：拦截产品请求，只把后台动态添加的保存到缓存
+      function setData(key, val) {
+        if (key === 'products') {
+            const dynamicProducts = val.filter(p => !p.isFixed);
+            localStorage.setItem('dynamicProducts', JSON.stringify(dynamicProducts));
+        } else {
+            localStorage.setItem(key, JSON.stringify(val));
+        }
+      }
 
-    let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-    let currentViewingProduct = null;
+      if (!localStorage.getItem("users")) setData("users", defaultData.users);
+      if (!localStorage.getItem("orders")) setData("orders", defaultData.orders);
 
-    function fileToBase64(file, callback) {
+      let currentUser = JSON.parse(localStorage.getItem("currentUser")) || null;
+      let currentViewingProduct = null;
+
+      function fileToBase64(file, callback) {
         const reader = new FileReader();
         reader.onload = (e) => callback(e.target.result);
         reader.readAsDataURL(file);
-    }
+      }
 
-    // ================= 前台逻辑：初始化与 UI 更新 =================
-    function initApp() {
+      function initApp() {
         renderHomeProducts();
         updateMemberUI();
-    }
+      }
 
-    function renderHomeProducts() {
-        const products = getData('products');
-        const container = document.getElementById('home-product-list');
-        container.innerHTML = products.map(p => `
-            <div class="product-card" onclick="openProductDetail(${p.id})">
+      function renderHomeProducts() {
+        const products = getData("products");
+        const container = document.getElementById("home-product-list");
+        container.innerHTML = products
+          .map(
+            (p) => `
+            <div class="product-card" onclick="openProductDetail('${p.id}')">
                 <img class="product-img" src="${p.img}" alt="商品" onerror="this.src='https://via.placeholder.com/400x400/eee?text=商品图'">
                 <div class="product-info">
                     <div class="product-title">${p.name}</div>
@@ -650,140 +1977,179 @@
                     </div>
                 </div>
             </div>
-        `).join('');
-    }
+        `,
+          )
+          .join("");
+      }
 
-    function updateMemberUI() {
-        if(currentUser && currentUser.role === 'user') {
-            document.getElementById('member-username').innerText = currentUser.nickname || currentUser.account;
-            document.getElementById('member-avatar').src = currentUser.avatar || 'https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80';
-            
-            document.getElementById('btn-logout').style.display = 'inline-block';
-            document.getElementById('btn-edit-profile').style.display = 'inline-block';
-            document.getElementById('btn-admin-login').style.display = 'inline-block';
-            
-            const orders = getData('orders').filter(o => o.userAccount === currentUser.account);
-            const counts = { shipment: 0, receipt: 0, review: 0 };
-            orders.forEach(o => {
-                if(o.status === 'pending_shipment') counts.shipment++;
-                if(o.status === 'pending_receipt') counts.receipt++;
-                if(o.status === 'pending_review') counts.review++;
-            });
-            ['shipment', 'receipt', 'review'].forEach(type => {
-                const el = document.getElementById(`badge-${type}`);
-                el.innerText = counts[type];
-                el.style.display = counts[type] > 0 ? 'inline-block' : 'none';
-            });
+      function updateMemberUI() {
+        if (currentUser && currentUser.role === "user") {
+          document.getElementById("member-username").innerText =
+            currentUser.nickname || currentUser.account;
+          document.getElementById("member-avatar").src =
+            currentUser.avatar ||
+            "https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80";
+
+          document.getElementById("btn-logout").style.display = "inline-block";
+          document.getElementById("btn-edit-profile").style.display =
+            "inline-block";
+          document.getElementById("btn-admin-login").style.display =
+            "inline-block";
+
+          const orders = getData("orders").filter(
+            (o) => o.userAccount === currentUser.account,
+          );
+          const counts = { shipment: 0, receipt: 0, review: 0 };
+          orders.forEach((o) => {
+            if (o.status === "pending_shipment") counts.shipment++;
+            if (o.status === "pending_receipt") counts.receipt++;
+            if (o.status === "pending_review") counts.review++;
+          });
+          ["shipment", "receipt", "review"].forEach((type) => {
+            const el = document.getElementById(`badge-${type}`);
+            el.innerText = counts[type];
+            el.style.display = counts[type] > 0 ? "inline-block" : "none";
+          });
         } else {
-            document.getElementById('member-username').innerText = '点击登录';
-            document.getElementById('member-avatar').src = 'https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80';
-            document.getElementById('btn-logout').style.display = 'none';
-            document.getElementById('btn-edit-profile').style.display = 'none';
-            document.getElementById('btn-admin-login').style.display = 'none';
-            ['shipment', 'receipt', 'review'].forEach(type => { 
-                document.getElementById(`badge-${type}`).style.display = 'none'; 
-            });
+          document.getElementById("member-username").innerText = "点击登录";
+          document.getElementById("member-avatar").src =
+            "https://images.unsplash.com/photo-1594824436845-a75168019bfa?w=200&q=80";
+          document.getElementById("btn-logout").style.display = "none";
+          document.getElementById("btn-edit-profile").style.display = "none";
+          document.getElementById("btn-admin-login").style.display = "none";
+          ["shipment", "receipt", "review"].forEach((type) => {
+            document.getElementById(`badge-${type}`).style.display = "none";
+          });
         }
-    }
+      }
 
-    // ================= 前台逻辑：导航、购买、订单查看 =================
-    function switchTab(tabId, element, requireAuth = false) {
-        document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        document.getElementById('page-' + tabId).classList.add('active');
-        element.classList.add('active');
-        if(requireAuth && !currentUser) { document.getElementById('login-modal').style.display = 'flex'; }
-    }
-    
-    function closeFullPage(id) { document.getElementById(id).style.display = 'none'; }
-    
-    function closeModal(id) { 
-        document.getElementById(id).style.display = 'none'; 
+      // ================= 前台逻辑 =================
+      function switchTab(tabId, element, requireAuth = false) {
+        document
+          .querySelectorAll(".page-container")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".tab-item")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById("page-" + tabId).classList.add("active");
+        element.classList.add("active");
+
+        if (requireAuth && (!currentUser || currentUser.role === "admin")) {
+          requireLogin();
+        }
+      }
+
+      function closeFullPage(id) {
+        document.getElementById(id).style.display = "none";
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).style.display = "none";
         const inputs = document.querySelectorAll(`#${id} input`);
-        inputs.forEach(input => {
-            if(input.type === 'file') input.value = '';
-            else input.value = '';
+        inputs.forEach((input) => {
+          if (input.type === "file") input.value = "";
+          else input.value = "";
         });
-    }
-    
-    function requireLogin() { 
-        if(!currentUser) {
-            document.getElementById('login-modal').style.display = 'flex'; 
-        }
-    }
+      }
 
-    function openProductDetail(id) {
-        const p = getData('products').find(x => x.id === id);
-        if(!p) return;
+      function requireLogin() {
+        if (!currentUser || currentUser.role === "admin") {
+          document.getElementById("login-modal").style.display = "flex";
+        }
+      }
+
+      function openProductDetail(id) {
+        // 使用 == 以兼容字符串 id 和数字 id
+        const p = getData("products").find((x) => x.id == id);
+        if (!p) return;
         currentViewingProduct = p;
-        document.getElementById('detail-img').src = p.img;
-        document.getElementById('detail-price').innerText = `¥ ${p.price}`;
-        document.getElementById('detail-title').innerText = p.name;
-        document.getElementById('detail-desc').innerText = p.desc || '非遗精品，匠心制作。';
-        document.getElementById('page-detail').style.display = 'block';
-    }
+        document.getElementById("detail-img").src = p.img;
+        document.getElementById("detail-price").innerText = `¥ ${p.price}`;
+        document.getElementById("detail-title").innerText = p.name;
+        document.getElementById("detail-desc").innerText =
+          p.desc || "非遗精品，匠心制作。";
+        document.getElementById("page-detail").style.display = "block";
+      }
 
-    function goToCheckout() {
-        if(!currentUser) {
-            alert('请先登录普通用户账户！');
-            document.getElementById('login-modal').style.display = 'flex';
-            return;
+      function goToCheckout() {
+        if (!currentUser || currentUser.role === "admin") {
+          alert("请先登录普通用户账户！");
+          document.getElementById("login-modal").style.display = "flex";
+          return;
         }
-        if(currentUser.role === 'admin') { alert('管理员账号不可用于前台购买！'); return; }
-        
+
         const p = currentViewingProduct;
-        document.getElementById('checkout-img').src = p.img;
-        document.getElementById('checkout-title').innerText = p.name;
-        document.getElementById('checkout-price').innerText = `¥ ${p.price}`;
-        document.getElementById('checkout-total').innerText = `¥ ${p.price}`;
-        document.getElementById('checkout-address').value = currentUser.address || '';
-        document.getElementById('page-checkout').style.display = 'block';
-    }
+        document.getElementById("checkout-img").src = p.img;
+        document.getElementById("checkout-title").innerText = p.name;
+        document.getElementById("checkout-price").innerText = `¥ ${p.price}`;
+        document.getElementById("checkout-total").innerText = `¥ ${p.price}`;
+        document.getElementById("checkout-address").value =
+          currentUser.address || "";
+        document.getElementById("page-checkout").style.display = "block";
+      }
 
-    function submitOrder() {
-        const address = document.getElementById('checkout-address').value.trim();
-        const payMethod = document.querySelector('input[name="pay-method"]:checked').value;
-        if(!address) { alert('请填写收货地址！'); return; }
+      function submitOrder() {
+        const address = document
+          .getElementById("checkout-address")
+          .value.trim();
+        const payMethod = document.querySelector(
+          'input[name="pay-method"]:checked',
+        ).value;
+        if (!address) {
+          alert("请填写收货地址！");
+          return;
+        }
 
-        let users = getData('users');
-        let userIdx = users.findIndex(u => u.account === currentUser.account);
+        let users = getData("users");
+        let userIdx = users.findIndex((u) => u.account === currentUser.account);
         users[userIdx].address = address;
-        setData('users', users);
+        setData("users", users);
         currentUser.address = address;
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
-        let orders = getData('orders');
+        let orders = getData("orders");
         orders.push({
-            id: 'ORD' + new Date().getTime(),
-            userAccount: currentUser.account,
-            productName: currentViewingProduct.name,
-            productImg: currentViewingProduct.img,
-            price: currentViewingProduct.price,
-            address: address,
-            payMethod: payMethod === 'WeChat' ? '微信支付' : '支付宝',
-            status: 'pending_shipment', 
-            date: new Date().toLocaleString()
+          id: "ORD" + new Date().getTime(),
+          userAccount: currentUser.account,
+          productName: currentViewingProduct.name,
+          productImg: currentViewingProduct.img,
+          price: currentViewingProduct.price,
+          address: address,
+          payMethod: payMethod === "WeChat" ? "微信支付" : "支付宝",
+          status: "pending_shipment",
+          date: new Date().toLocaleString(),
         });
-        setData('orders', orders);
+        setData("orders", orders);
 
-        alert('支付成功！商品将在后台排期发货。');
-        closeFullPage('page-checkout');
-        closeFullPage('page-detail');
+        alert("支付成功！商品将在后台排期发货。");
+        closeFullPage("page-checkout");
+        closeFullPage("page-detail");
         updateMemberUI();
-        document.querySelectorAll('.tab-item')[3].click(); 
-    }
+        document.querySelectorAll(".tab-item")[3].click();
+      }
 
-    const statusMap = { 'pending_shipment': '待发货', 'pending_receipt': '待收货', 'pending_review': '待评价' };
-    function showUserOrders(statusFilter) {
-        if(!currentUser) return;
-        document.getElementById('my-orders-title').innerText = statusMap[statusFilter] + '订单';
-        const orders = getData('orders').filter(o => o.userAccount === currentUser.account && o.status === statusFilter);
-        const container = document.getElementById('my-orders-list');
-        
-        if(orders.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">暂无相关订单</div>';
+      const statusMap = {
+        pending_shipment: "待发货",
+        pending_receipt: "待收货",
+        pending_review: "待评价",
+      };
+      function showUserOrders(statusFilter) {
+        if (!currentUser) return;
+        document.getElementById("my-orders-title").innerText =
+          statusMap[statusFilter] + "订单";
+        const orders = getData("orders").filter(
+          (o) =>
+            o.userAccount === currentUser.account && o.status === statusFilter,
+        );
+        const container = document.getElementById("my-orders-list");
+
+        if (orders.length === 0) {
+          container.innerHTML =
+            '<div style="text-align:center; padding:30px; color:#999;">暂无相关订单</div>';
         } else {
-            container.innerHTML = orders.map(o => `
+          container.innerHTML = orders
+            .map(
+              (o) => `
                 <div class="order-list-item">
                     <div style="font-size:12px; color:#999; margin-bottom:10px;">订单号: ${o.id} <span class="order-status">${statusMap[o.status]}</span></div>
                     <div style="display:flex;">
@@ -794,341 +2160,407 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `,
+            )
+            .join("");
         }
-        document.getElementById('page-my-orders').style.display = 'block';
-    }
+        document.getElementById("page-my-orders").style.display = "block";
+      }
 
-    // ================= 前台逻辑：登录与注册 =================
-    function toggleAuth(mode) {
-        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-        document.getElementById('tab-register').classList.toggle('active', mode === 'register');
-        document.getElementById('form-login').style.display = mode === 'login' ? 'block' : 'none';
-        document.getElementById('form-register').style.display = mode === 'register' ? 'block' : 'none';
-    }
+      // ================= 前台逻辑：登录与注册 =================
+      function toggleAuth(mode) {
+        document
+          .getElementById("tab-login")
+          .classList.toggle("active", mode === "login");
+        document
+          .getElementById("tab-register")
+          .classList.toggle("active", mode === "register");
+        document.getElementById("form-login").style.display =
+          mode === "login" ? "block" : "none";
+        document.getElementById("form-register").style.display =
+          mode === "register" ? "block" : "none";
+      }
 
-    function doRegister() {
-        const acc = document.getElementById('reg-account').value.trim();
-        const pwd = document.getElementById('reg-password').value.trim();
-        if(!acc || !pwd) { alert('账号和密码不能为空！'); return; }
-        
-        let users = getData('users');
-        if(users.some(u => u.account === acc)) { alert('账号已存在，请直接登录！'); return; }
-        
-        users.push({ id: 'u_'+Date.now(), role: 'user', account: acc, password: pwd, nickname: '', avatar: '', address: '' });
-        setData('users', users);
-        alert('注册成功！请登录。');
-        toggleAuth('login');
-        document.getElementById('reg-account').value = '';
-        document.getElementById('reg-password').value = '';
-    }
+      function doRegister() {
+        const acc = document.getElementById("reg-account").value.trim();
+        const pwd = document.getElementById("reg-password").value.trim();
+        if (!acc || !pwd) {
+          alert("账号和密码不能为空！");
+          return;
+        }
 
-    function doLogin() {
-        const role = document.getElementById('login-role').value;
-        const acc = document.getElementById('login-account').value.trim();
-        const pwd = document.getElementById('login-password').value.trim();
-        
-        const users = getData('users');
-        const user = users.find(u => u.account === acc && u.password === pwd && u.role === role);
-        
-        if(user) {
-            currentUser = user;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            closeModal('login-modal'); 
-            if(role === 'admin') initAdmin(); else updateMemberUI();
+        let users = getData("users");
+        if (users.some((u) => u.account === acc)) {
+          alert("账号已存在，请直接登录！");
+          return;
+        }
+
+        users.push({
+          id: "u_" + Date.now(),
+          role: "user",
+          account: acc,
+          password: pwd,
+          nickname: "",
+          avatar: "",
+          address: "",
+        });
+        setData("users", users);
+        alert("注册成功！请登录。");
+        toggleAuth("login");
+        document.getElementById("reg-account").value = "";
+        document.getElementById("reg-password").value = "";
+      }
+
+      function doLogin() {
+        const role = document.getElementById("login-role").value;
+        const acc = document.getElementById("login-account").value.trim();
+        const pwd = document.getElementById("login-password").value.trim();
+
+        const users = getData("users");
+        const user = users.find(
+          (u) => u.account === acc && u.password === pwd && u.role === role,
+        );
+
+        if (user) {
+          currentUser = user;
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          closeModal("login-modal");
+          if (role === "admin") initAdmin();
+          else updateMemberUI();
         } else {
-            alert('账号或密码错误，或身份不匹配！');
+          alert("账号或密码错误，或身份不匹配！");
         }
-    }
+      }
 
-    function logout() {
+      function logout() {
         currentUser = null;
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem("currentUser");
         updateMemberUI();
-    }
+      }
 
-    // ================= 前台修改个人资料 =================
-    function openEditProfileModal() {
-        if(!currentUser) return;
-        document.getElementById('edit-profile-nickname').value = currentUser.nickname || '';
-        document.getElementById('edit-profile-modal').style.display = 'flex';
-    }
+      function openEditProfileModal() {
+        if (!currentUser) return;
+        document.getElementById("edit-profile-nickname").value =
+          currentUser.nickname || "";
+        document.getElementById("edit-profile-modal").style.display = "flex";
+      }
 
-    function saveUserProfile() {
-        const newNickname = document.getElementById('edit-profile-nickname').value.trim();
-        const fileInput = document.getElementById('edit-profile-avatar-file');
-        
+      function saveUserProfile() {
+        const newNickname = document
+          .getElementById("edit-profile-nickname")
+          .value.trim();
+        const fileInput = document.getElementById("edit-profile-avatar-file");
+
         const finishSave = (base64Img) => {
-            let users = getData('users');
-            let userIdx = users.findIndex(u => u.account === currentUser.account);
-            if(userIdx !== -1) {
-                users[userIdx].nickname = newNickname;
-                if(base64Img) users[userIdx].avatar = base64Img;
-                
-                setData('users', users);
-                
-                currentUser.nickname = newNickname;
-                if(base64Img) currentUser.avatar = base64Img;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
-                updateMemberUI();
-                alert('资料修改成功！');
-                closeModal('edit-profile-modal');
-            }
+          let users = getData("users");
+          let userIdx = users.findIndex(
+            (u) => u.account === currentUser.account,
+          );
+          if (userIdx !== -1) {
+            users[userIdx].nickname = newNickname;
+            if (base64Img) users[userIdx].avatar = base64Img;
+
+            setData("users", users);
+
+            currentUser.nickname = newNickname;
+            if (base64Img) currentUser.avatar = base64Img;
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+            updateMemberUI();
+            alert("资料修改成功！");
+            closeModal("edit-profile-modal");
+          }
         };
 
-        if(fileInput.files && fileInput.files[0]) {
-            fileToBase64(fileInput.files[0], finishSave); 
+        if (fileInput.files && fileInput.files[0]) {
+          fileToBase64(fileInput.files[0], finishSave);
         } else {
-            finishSave(null); 
+          finishSave(null);
         }
-    }
+      }
 
-    // ================= 快捷验证进入管理员后台 =================
-    function openAdminVerifyModal() {
-        document.getElementById('admin-verify-modal').style.display = 'flex';
-    }
+      function openAdminVerifyModal() {
+        document.getElementById("admin-verify-modal").style.display = "flex";
+      }
 
-    function verifyAdminAndEnter() {
-        const acc = document.getElementById('admin-verify-account').value.trim();
-        const pwd = document.getElementById('admin-verify-password').value.trim();
-        const users = getData('users');
-        const adminUser = users.find(u => u.account === acc && u.password === pwd && u.role === 'admin');
-        
-        if(adminUser) {
-            closeModal('admin-verify-modal');
-            initAdmin();
+      function verifyAdminAndEnter() {
+        const acc = document
+          .getElementById("admin-verify-account")
+          .value.trim();
+        const pwd = document
+          .getElementById("admin-verify-password")
+          .value.trim();
+        const users = getData("users");
+        const adminUser = users.find(
+          (u) => u.account === acc && u.password === pwd && u.role === "admin",
+        );
+
+        if (adminUser) {
+          closeModal("admin-verify-modal");
+          initAdmin();
         } else {
-            alert('管理员账号或密码错误！');
+          alert("管理员账号或密码错误！");
         }
-    }
+      }
 
-    // ==========================================================
-    // ================= 管理员后台逻辑 =========================
-    // ==========================================================
+      // ================= 管理员后台逻辑 =================
 
-    function initAdmin() {
-        document.getElementById('app').style.display = 'none'; 
-        document.getElementById('admin-dashboard').style.display = 'flex'; 
+      function initAdmin() {
+        document.getElementById("app").style.display = "none";
+        document.getElementById("admin-dashboard").style.display = "flex";
         renderAdminProducts();
         renderAdminOrders();
         renderAdminUsers();
-    }
+      }
 
-    function logoutAdmin() {
-        document.getElementById('admin-dashboard').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
+      function logoutAdmin() {
+        document.getElementById("admin-dashboard").style.display = "none";
+        document.getElementById("app").style.display = "block";
         updateMemberUI();
-    }
+      }
 
-    function switchAdminTab(tab, element) {
-        document.querySelectorAll('.admin-menu-item').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.admin-panel').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
-        document.getElementById('admin-' + tab).classList.add('active');
-        if(tab==='products') renderAdminProducts();
-        if(tab==='orders') renderAdminOrders();
-        if(tab==='users') renderAdminUsers();
-    }
+      function switchAdminTab(tab, element) {
+        document
+          .querySelectorAll(".admin-menu-item")
+          .forEach((el) => el.classList.remove("active"));
+        document
+          .querySelectorAll(".admin-panel")
+          .forEach((el) => el.classList.remove("active"));
+        element.classList.add("active");
+        document.getElementById("admin-" + tab).classList.add("active");
+        if (tab === "products") renderAdminProducts();
+        if (tab === "orders") renderAdminOrders();
+        if (tab === "users") renderAdminUsers();
+      }
 
-    let editingProductId = null;
-    let tempProductImageBase64 = '';
+      let editingProductId = null;
+      let tempProductImageBase64 = "";
 
-    function previewProductImage(input) {
-        if(input.files && input.files[0]) {
-            fileToBase64(input.files[0], (base64) => {
-                tempProductImageBase64 = base64;
-                document.getElementById('add-prod-img-preview').src = base64;
-                document.getElementById('add-prod-img-preview').style.display = 'block';
-            });
+      function previewProductImage(input) {
+        if (input.files && input.files[0]) {
+          fileToBase64(input.files[0], (base64) => {
+            tempProductImageBase64 = base64;
+            document.getElementById("add-prod-img-preview").src = base64;
+            document.getElementById("add-prod-img-preview").style.display =
+              "block";
+          });
         }
-    }
+      }
 
-    function renderAdminProducts() {
-        const products = getData('products');
-        const tbody = document.querySelector('#admin-product-table tbody');
-        tbody.innerHTML = products.map(p => `
+      function renderAdminProducts() {
+        const products = getData("products");
+        const tbody = document.querySelector("#admin-product-table tbody");
+        tbody.innerHTML = products
+          .map(
+            (p) => `
             <tr>
-                <td>${p.id}</td>
+                <td>${p.isFixed ? '<span style="color:#999; font-size:12px;">内置</span>' : p.id}</td>
                 <td><img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/40/eee'"></td>
                 <td style="max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</td>
                 <td>¥${p.price}</td>
                 <td style="white-space:nowrap;">
-                    <button class="admin-btn btn-orange" onclick="adminEditProduct(${p.id})">修改</button>
-                    <button class="admin-btn btn-red" onclick="adminDeleteProduct(${p.id})">删除</button>
+                    ${p.isFixed 
+                        ? '<span style="color:#999; font-size:12px;">内置商品不可修改/删除</span>' 
+                        : `<button class="admin-btn btn-orange" onclick="adminEditProduct('${p.id}')">修改</button>
+                           <button class="admin-btn btn-red" onclick="adminDeleteProduct('${p.id}')">删除</button>`
+                    }
                 </td>
             </tr>
-        `).join('');
-    }
+        `,
+          )
+          .join("");
+      }
 
-    function adminEditProduct(id) {
-        const p = getData('products').find(x => x.id === id);
-        if(!p) return;
+      function adminEditProduct(id) {
+        // 使用 == 兼容
+        const p = getData("products").find((x) => x.id == id);
+        if (!p || p.isFixed) return;
         editingProductId = p.id;
         tempProductImageBase64 = p.img;
-        
-        document.getElementById('admin-prod-form-title').innerText = "修改商品信息 (ID: " + p.id + ")";
-        document.getElementById('add-prod-name').value = p.name;
-        document.getElementById('add-prod-price').value = p.price;
-        document.getElementById('add-prod-desc').value = p.desc || '';
-        document.getElementById('add-prod-img-file').value = ''; 
-        
-        document.getElementById('add-prod-img-preview').src = p.img;
-        document.getElementById('add-prod-img-preview').style.display = 'block';
-        
-        document.getElementById('btn-save-prod').innerText = "保存修改";
-        document.getElementById('btn-save-prod').className = "admin-btn btn-green";
-        document.getElementById('btn-cancel-prod').style.display = "block";
-    }
 
-    function cancelEditProduct() {
+        document.getElementById("admin-prod-form-title").innerText =
+          "修改商品信息 (ID: " + p.id + ")";
+        document.getElementById("add-prod-name").value = p.name;
+        document.getElementById("add-prod-price").value = p.price;
+        document.getElementById("add-prod-desc").value = p.desc || "";
+        document.getElementById("add-prod-img-file").value = "";
+
+        document.getElementById("add-prod-img-preview").src = p.img;
+        document.getElementById("add-prod-img-preview").style.display = "block";
+
+        document.getElementById("btn-save-prod").innerText = "保存修改";
+        document.getElementById("btn-save-prod").className =
+          "admin-btn btn-green";
+        document.getElementById("btn-cancel-prod").style.display = "block";
+      }
+
+      function cancelEditProduct() {
         editingProductId = null;
-        tempProductImageBase64 = '';
-        document.getElementById('admin-prod-form-title').innerText = "添加新商品";
-        document.getElementById('add-prod-name').value = '';
-        document.getElementById('add-prod-price').value = '';
-        document.getElementById('add-prod-desc').value = '';
-        document.getElementById('add-prod-img-file').value = '';
-        document.getElementById('add-prod-img-preview').style.display = 'none';
-        
-        document.getElementById('btn-save-prod').innerText = "+ 添加商品";
-        document.getElementById('btn-save-prod').className = "admin-btn btn-blue";
-        document.getElementById('btn-cancel-prod').style.display = "none";
-    }
+        tempProductImageBase64 = "";
+        document.getElementById("admin-prod-form-title").innerText =
+          "添加新商品";
+        document.getElementById("add-prod-name").value = "";
+        document.getElementById("add-prod-price").value = "";
+        document.getElementById("add-prod-desc").value = "";
+        document.getElementById("add-prod-img-file").value = "";
+        document.getElementById("add-prod-img-preview").style.display = "none";
 
-    function adminSaveProduct() {
-        const name = document.getElementById('add-prod-name').value;
-        const price = document.getElementById('add-prod-price').value;
-        const desc = document.getElementById('add-prod-desc').value;
-        
-        if(!name || !price) { alert('商品名称和价格必填！'); return; }
-        const finalImg = tempProductImageBase64 || 'https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=400&q=80';
+        document.getElementById("btn-save-prod").innerText = "+ 添加商品";
+        document.getElementById("btn-save-prod").className =
+          "admin-btn btn-blue";
+        document.getElementById("btn-cancel-prod").style.display = "none";
+      }
 
-        let products = getData('products');
+      function adminSaveProduct() {
+        const name = document.getElementById("add-prod-name").value;
+        const price = document.getElementById("add-prod-price").value;
+        const desc = document.getElementById("add-prod-desc").value;
 
-        if(editingProductId) {
-            let idx = products.findIndex(p => p.id === editingProductId);
-            if(idx !== -1) {
-                products[idx] = { ...products[idx], name, price, img: finalImg, desc };
-            }
-            alert('商品修改成功！');
+        if (!name || !price) {
+          alert("商品名称和价格必填！");
+          return;
+        }
+        const finalImg =
+          tempProductImageBase64 ||
+          "https://images.unsplash.com/photo-1544253372-e56d7ce7614e?w=400&q=80";
+
+        let products = getData("products");
+
+        if (editingProductId) {
+          let idx = products.findIndex((p) => p.id === editingProductId);
+          if (idx !== -1 && !products[idx].isFixed) {
+            products[idx] = {
+              ...products[idx],
+              name,
+              price,
+              img: finalImg,
+              desc,
+            };
+          }
+          alert("商品修改成功！");
         } else {
-            const newId = products.length > 0 ? Math.max(...products.map(p=>p.id)) + 1 : 1;
-            products.push({ id: newId, name, price, img: finalImg, desc });
-            alert('商品添加成功！');
+          // 生成唯一的新ID
+          const newId = Date.now();
+          products.push({ id: newId, name, price, img: finalImg, desc });
+          alert("商品添加成功！");
         }
 
-        setData('products', products);
-        renderAdminProducts();
-        renderHomeProducts(); 
-        cancelEditProduct(); 
-    }
-
-    function adminDeleteProduct(id) {
-        if(!confirm('确定删除该商品吗？前台展示也会移除。')) return;
-        let products = getData('products').filter(p => p.id !== id);
-        setData('products', products);
+        setData("products", products);
         renderAdminProducts();
         renderHomeProducts();
-    }
+        cancelEditProduct();
+      }
 
-    // ----------------- 后台：订单管理 -----------------
-    function renderAdminOrders() {
-        const orders = getData('orders');
-        const tbody = document.querySelector('#admin-order-table tbody');
-        if(orders.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#999;">暂无用户订单</td></tr>'; return; }
-        
-        tbody.innerHTML = orders.map(o => `
+      function adminDeleteProduct(id) {
+        if (!confirm("确定删除该商品吗？前台展示也会移除。")) return;
+        let products = getData("products").filter((p) => p.id != id);
+        setData("products", products);
+        renderAdminProducts();
+        renderHomeProducts();
+      }
+
+      function renderAdminOrders() {
+        const orders = getData("orders");
+        const tbody = document.querySelector("#admin-order-table tbody");
+        if (orders.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="6" style="text-align:center; color:#999;">暂无用户订单</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = orders
+          .map(
+            (o) => `
             <tr>
                 <td>${o.id}</td>
                 <td>${o.userAccount}</td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${o.productName}</td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${o.address}</td>
-                <td style="color:${o.status==='pending_shipment'?'red':'#52c41a'}; font-weight:bold;">${statusMap[o.status]}</td>
+                <td style="color:${o.status === "pending_shipment" ? "red" : "#52c41a"}; font-weight:bold;">${statusMap[o.status]}</td>
                 <td style="white-space:nowrap;">
-                    ${o.status === 'pending_shipment' ? `<button class="admin-btn btn-blue" onclick="adminProcessOrder('${o.id}', 'pending_receipt')">去发货</button>` : ''}
-                    ${o.status === 'pending_receipt' ? `<button class="admin-btn btn-green" onclick="adminProcessOrder('${o.id}', 'pending_review')">完成</button>` : ''}
+                    ${o.status === "pending_shipment" ? `<button class="admin-btn btn-blue" onclick="adminProcessOrder('${o.id}', 'pending_receipt')">去发货</button>` : ""}
+                    ${o.status === "pending_receipt" ? `<button class="admin-btn btn-green" onclick="adminProcessOrder('${o.id}', 'pending_review')">完成</button>` : ""}
                 </td>
             </tr>
-        `).join('');
-    }
+        `,
+          )
+          .join("");
+      }
 
-    function adminProcessOrder(orderId, nextStatus) {
-        let orders = getData('orders');
-        let order = orders.find(o => o.id === orderId);
-        if(order) {
-            order.status = nextStatus;
-            setData('orders', orders);
-            renderAdminOrders();
-            if(currentUser && currentUser.account === order.userAccount) updateMemberUI(); 
+      function adminProcessOrder(orderId, nextStatus) {
+        let orders = getData("orders");
+        let order = orders.find((o) => o.id === orderId);
+        if (order) {
+          order.status = nextStatus;
+          setData("orders", orders);
+          renderAdminOrders();
+          if (currentUser && currentUser.account === order.userAccount)
+            updateMemberUI();
         }
-    }
+      }
 
-    // ----------------- 后台：点击图片直接修改用户头像 -----------------
-    function renderAdminUsers() {
-        const users = getData('users');
-        const tbody = document.querySelector('#admin-user-table tbody');
-        tbody.innerHTML = users.map(u => `
+      function renderAdminUsers() {
+        const users = getData("users");
+        const tbody = document.querySelector("#admin-user-table tbody");
+        tbody.innerHTML = users
+          .map(
+            (u) => `
             <tr>
-                <td style="white-space:nowrap;">${u.role === 'admin' ? '<span style="color:red;font-weight:bold;">管理员</span>' : '普通用户'}</td>
+                <td style="white-space:nowrap;">${u.role === "admin" ? '<span style="color:red;font-weight:bold;">管理员</span>' : "普通用户"}</td>
                 <td>${u.nickname || u.account}<br><small style="color:#999;">${u.account}</small></td>
                 <td>${u.password}</td>
                 <td style="text-align:center;">
                     <label style="cursor:pointer; display:inline-block; position:relative;" title="点击上传修改用户头像">
-                        <img src="${u.avatar || 'https://via.placeholder.com/40'}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid #ddd;" onerror="this.src='https://via.placeholder.com/40/eee'">
+                        <img src="${u.avatar || "https://via.placeholder.com/40"}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid #ddd;" onerror="this.src='https://via.placeholder.com/40/eee'">
                         <input type="file" accept="image/*" style="display:none;" onchange="adminUpdateUserAvatar(this, '${u.account}')">
                     </label>
                 </td>
                 <td style="max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${u.address || '<span style="color:#ccc;">暂未填写</span>'}</td>
             </tr>
-        `).join('');
-    }
+        `,
+          )
+          .join("");
+      }
 
-    function adminUpdateUserAvatar(inputEl, account) {
-        if(inputEl.files && inputEl.files[0]) {
-            fileToBase64(inputEl.files[0], (base64) => {
-                let users = getData('users');
-                let user = users.find(u => u.account === account);
-                if(user) {
-                    user.avatar = base64;
-                    setData('users', users);
-                    
-                    if(currentUser && currentUser.account === account) {
-                        currentUser.avatar = base64;
-                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                        updateMemberUI();
-                    }
-                    renderAdminUsers(); 
-                    alert('已成功为该用户更换头像！');
-                }
-            });
+      function adminUpdateUserAvatar(inputEl, account) {
+        if (inputEl.files && inputEl.files[0]) {
+          fileToBase64(inputEl.files[0], (base64) => {
+            let users = getData("users");
+            let user = users.find((u) => u.account === account);
+            if (user) {
+              user.avatar = base64;
+              setData("users", users);
+
+              if (currentUser && currentUser.account === account) {
+                currentUser.avatar = base64;
+                localStorage.setItem(
+                  "currentUser",
+                  JSON.stringify(currentUser),
+                );
+                updateMemberUI();
+              }
+              renderAdminUsers();
+              alert("已成功为该用户更换头像！");
+            }
+          });
         }
-    }
+      }
 
-
-    // ================= 强大的统一轮播图调度器 =================
-    function startCarousel(containerId, count) {
+      // ================= 统一轮播图 =================
+      function startCarousel(containerId, count) {
         let ci = document.getElementById(containerId);
         if (!ci) return;
         let index = 0;
         setInterval(() => {
-            index = (index + 1) % count;
-            ci.style.transform = `translateX(-${index * (100 / count)}%)`;
+          index = (index + 1) % count;
+          ci.style.transform = `translateX(-${index * (100 / count)}%)`;
         }, 3500);
-    }
+      }
 
-    // ================= 执行初始化 =================
-    initApp();
-    
-    // 初始化两个轮播图
-    startCarousel('home-carousel-inner', 4);
-    startCarousel('masters-carousel-inner', 4);
-
-    if(currentUser && currentUser.role === 'admin') {
-        initAdmin();
-    }
-
-</script>
-
-</body>
+      // ================= 执行初始化 =================
+      initApp();
+      startCarousel("home-carousel-inner", 4);
+      startCarousel("masters-carousel-inner", 4);
+    </script>
+  </body>
 </html>
